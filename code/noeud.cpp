@@ -1,5 +1,10 @@
 #include "noeud.h"
 
+Noeud::Noeud(int i, int j) {
+  this->i = i;
+  this->j = j;
+}
+
 Noeud::Noeud(int i, int j, double x, double y) {
   this->i = i;
   this->j = j;

@@ -1,5 +1,5 @@
 class Noeud {
-  // Coordonées.
+  // Coordonnées.
   int i;
   int j;
 
@@ -7,7 +7,8 @@ class Noeud {
   double y;
 
 public:
-  // Constructeur.
+  // Constructeurs:
+  Noeud(int i, int j);
   Noeud(int i, int j, double x, double y);
 
   // Question 11:
