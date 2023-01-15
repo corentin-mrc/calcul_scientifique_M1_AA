@@ -1,5 +1,7 @@
 #include "noeud.h"
 
+Noeud::Noeud(void) {}
+
 Noeud::Noeud(int i, int j) {
   this->i = i;
   this->j = j;

@@ -3,6 +3,7 @@
 
 #include "constantes.h"
 #include "noeud.h"
+#include "triangle.h"
 
 using namespace std;
 
@@ -27,32 +28,27 @@ vector<double> Subdiv(int N) {
 }
 
 // Question 20.
-// Retourne une matrice K * 3 dont la l-ème ligne contient les trois numéros
-// globaux des sommets du triangle T_l.
-vector<vector<int>> maillageTR(int N, int M) {
+// Retourne un tableau de triangle dont la l-ème ligne contient le triangle T_l.
+vector<Triangle> maillageTR(int N, int M) {
   // Génère la matrice des triangles.
-  vector<vector<int>> triangles;
+  vector<Triangle> triangles;
   for (int j = 0; j < M; j++) {
-    vector<int> triangle1;
-    vector<int> triangle2;
     for (int i = 0; i < N; i++) {
       // Il y a 2 configurations possibles en fonction de la position du
       // rectangle du maillage qui nous intéresse. Dans chaque cas, il
       // faut déterminer les sommets du rectangle et les placer dans un
       // certain ordre.
-      int a = Noeud(i, j).numgb(N, M);
-      int b = Noeud(i + 1, j).numgb(N, M);
-      int c = Noeud(i, j + 1).numgb(N, M);
-      int d = Noeud(i + 1, j + 1).numgb(N, M);
+      Noeud a(i, j);
+      Noeud b(i + 1, j);
+      Noeud c(i, j + 1);
+      Noeud d(i + 1, j + 1);
       if (i % 2 == j % 2) {
-        triangle1 = {a, c, d};
-        triangle2 = {a, b, d};
+        triangles.push_back(Triangle(a, c, d));
+        triangles.push_back(Triangle(a, b, d));
       } else {
-        triangle1 = {a, b, c};
-        triangle2 = {b, c, d};
+        triangles.push_back(Triangle(a, b, c));
+        triangles.push_back(Triangle(b, c, d));
       }
-      triangles.push_back(triangle1);
-      triangles.push_back(triangle2);
     }
   }
   return triangles;
@@ -60,23 +56,21 @@ vector<vector<int>> maillageTR(int N, int M) {
 
 int main(void) {
   // Un petit test pour les noeuds.
-  int N = 5;
-  int M = 3;
+  int N = 10;
+  int M = 20;
   Noeud n(1, 2, 3.4, 3.4);
   cout << n.numgb(N, M) << endl;
   cout << n.numint(N, M) << endl;
   cout << n.num_gb_int(N, M, 21) << endl;
   cout << n.num_int_gb(N, M, 6) << endl;
 
+  cout << endl;
+
   // Un petit test pour la triangulation.
-  vector<vector<int>> tri = maillageTR(N, M);
+  vector<Triangle> tri = maillageTR(N, M);
   cout << "Test de la triangulation pour N = " << N << " et M = " << M << endl;
-  for (vector<int> triangle : tri) {
-    for (int i : triangle) {
-      cout << i << " ";
-    }
-    cout << endl;
-  }
+  for (Triangle triangle : tri)
+    triangle.affiche_sommets_glb(N, M);
   cout << "Il y a " << tri.size() << " triangles." << endl;
 
   return 0;

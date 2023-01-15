@@ -1,3 +1,6 @@
+#ifndef NOEUD_H
+#define NOEUD_H
+
 class Noeud {
   // Coordonnées.
   int i;
@@ -7,6 +10,8 @@ class Noeud {
   double y;
 
 public:
+  // Constructeur par défaut:
+  Noeud(void);
   // Constructeurs:
   Noeud(int i, int j);
   Noeud(int i, int j, double x, double y);
@@ -37,3 +42,5 @@ public:
   // Met à jour les coordonnées en fonction du numéro global fourni.
   int num_gb_int(int N, int M, int s);
 };
+
+#endif
