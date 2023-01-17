@@ -7,6 +7,10 @@ Noeud::Noeud(int i, int j) {
   this->j = j;
 }
 
+double Noeud::getx(void) { return x; }
+
+double Noeud::gety(void) { return y; }
+
 Noeud::Noeud(int i, int j, double x, double y) {
   this->i = i;
   this->j = j;

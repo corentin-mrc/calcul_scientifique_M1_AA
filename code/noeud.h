@@ -2,10 +2,11 @@
 #define NOEUD_H
 
 class Noeud {
-  // Coordonnées.
+  // Indice dans le maillage global.
   int i;
   int j;
 
+  // Coordonnées.
   double x;
   double y;
 
@@ -15,6 +16,10 @@ public:
   // Constructeurs:
   Noeud(int i, int j);
   Noeud(int i, int j, double x, double y);
+
+  // Getters
+  double getx(void);
+  double gety(void);
 
   // Question 11:
   // Retourne le numéro global d'un noeud.

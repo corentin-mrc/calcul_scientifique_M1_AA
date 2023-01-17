@@ -67,11 +67,15 @@ int main(void) {
   cout << endl;
 
   // Un petit test pour la triangulation.
-  vector<Triangle> tri = maillageTR(N, M);
+  vector<Triangle> triangulation = maillageTR(N, M);
   cout << "Test de la triangulation pour N = " << N << " et M = " << M << endl;
-  for (Triangle triangle : tri)
+  for (Triangle triangle : triangulation)
     triangle.affiche_sommets_glb(N, M);
-  cout << "Il y a " << tri.size() << " triangles." << endl;
+  cout << "Il y a " << triangulation.size() << " triangles." << endl;
+
+  cout << endl;
+  Triangle t(Noeud(0, 0, 0, 0), Noeud(1, 0, 1, 0), Noeud(0, 1, 0, 1));
+  cout << t.DetMatBT() << endl;
 
   return 0;
 }
