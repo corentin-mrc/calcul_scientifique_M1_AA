@@ -12,19 +12,19 @@ using namespace std;
 // Retourne f_eta (x, y).
 double fsecond_membre(double (*ug)(double), double (*ud)(double),
                       double (*ugpp)(double), double (*udpp)(double), double x,
-                      double y) {
-  return (-epsilon * (a - x) * ugpp(y) - epsilon * (a + x) * udpp(y) -
-          gama * ug(y) + gama * ud(y) + lambda * (a - x) * ug(y) +
+                      double y, double a) {
+  return (epsilon * (a - x) * ugpp(y) + epsilon * (a + x) * udpp(y) +
+          gama * ug(y) - gama * ud(y) - lambda * (a - x) * ug(y) -
           lambda * (a + x) * ud(y)) /
          (2 * a);
 }
 
 // Question 9:
 // Retourne une subdivision uniforme de [-a, a] en N + 1 points.
-vector<double> Subdiv(int N) {
+vector<double> Subdiv(double a, int N) {
   vector<double> xi;
   for (int i = 0; i <= N; i++)
-    xi.push_back(-a + (2. * i * a) / N);
+    xi.push_back(-a + (2 * i * a) / N);
   return xi;
 }
 

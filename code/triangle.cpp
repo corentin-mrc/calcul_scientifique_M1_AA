@@ -33,9 +33,18 @@ vector<vector<double>> Triangle::InvMatBT(void) {
 vector<vector<double>> Triangle::DiffTerm(void) {
   vector<vector<double>> BI = InvMatBT();
   double d = DetMatBT() / 2;
-  double d1 = pow(BI[0][0] + BI[0][1], 2) * d;
-  double d2 = pow(BI[1][0] + BI[1][1], 2) * d;
-  return {{d1 + d2, -d1, -d2}, {-d1, d1, 0}, {-d2, 0, d2}};
+  //double d1 = pow(BI[0][0] + BI[0][1], 2) * d;
+  //double d2 = pow(BI[1][0] + BI[1][1], 2) * d;
+  //return {{d1 + d2, -d1, -d2}, {-d1, d1, 0}, {-d2, 0, d2}};
+  double d1 = BI[0][0] + BI[1][0];
+  double d2 = BI[0][1] + BI[1][1];
+  double m00 = (d1 * d1 + d2 * d2) * d;
+  double m01 = (-BI[0][0] * d1 - BI[0][1] * d2) * d;
+  double m02 = (-BI[1][0] * d1 - BI[1][1] * d2) * d;
+  double m11 = (BI[0][0] * BI[0][0] + BI[0][1] * BI[0][1]) * d;
+  double m12 = (BI[0][0] * BI[1][0] + BI[0][1] * BI[1][1]) * d;
+  double m22 = (BI[1][0] * BI[1][0] + BI[1][1] * BI[1][1]) * d;
+  return {{m00, m01, m02}, {m01, m11, m12}, {m02, m12, m22}};
 }
 
 vector<vector<double>> Triangle::ConvectTerm(void) {
