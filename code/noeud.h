@@ -1,6 +1,8 @@
 #ifndef NOEUD_H
 #define NOEUD_H
 
+#include "maillage.h"
+
 class Noeud {
   // Indice dans le maillage global.
   int i;
@@ -15,6 +17,7 @@ public:
   Noeud(void);
   // Constructeurs:
   Noeud(int i, int j);
+  Noeud(int i, int j, Maillage maille);
   Noeud(int i, int j, double x, double y);
 
   // Getters
@@ -23,29 +26,29 @@ public:
 
   // Question 11:
   // Retourne le numéro global d'un noeud.
-  int numgb(int N, int M);
+  int numgb(Maillage maille);
 
   // Question 13:
   // Détermine les indices i et j à partir du numéro global du noeud.
-  void invnumgb(int N, int M, int s);
+  void invnumgb(Maillage maille, int s);
 
   // Question 14:
   // Retourne le numéro intérieur d'un noeud.
-  int numint(int N, int M);
+  int numint(Maillage maille);
 
   // Question 16:
   // Determine les indices i et j à partir du numéro intérieur du noeud.
-  void invumint(int N, int M, int k);
+  void invumint(Maillage maille, int k);
 
   // Question 17:
   // Retourne le numéro global d'un noeud à partir de son numéro intérieur
   // Met à jour les coordonnées en fonction du numéro intérieur fourni.
-  int num_int_gb(int N, int M, int k);
+  int num_int_gb(Maillage maille, int k);
 
   // Question 18:
   // Retourne le numéro intérieur d'un noeud à partir de son numéro global.
   // Met à jour les coordonnées en fonction du numéro global fourni.
-  int num_gb_int(int N, int M, int s);
+  int num_gb_int(Maillage maille, int s);
 };
 
 #endif

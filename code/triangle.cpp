@@ -50,7 +50,7 @@ vector<vector<double>> Triangle::ReacTerm(void) {
   return {{r1, r2, r2}, {r2, r1, r1}, {r2, r1, r1}};
 }
 
-void Triangle::affiche_sommets_glb(int N, int M) {
-  cout << n0.numgb(N, M) << " " << n1.numgb(N, M) << " " << n2.numgb(N, M)
+void Triangle::affiche_sommets_glb(Maillage maille) {
+  cout << n0.numgb(maille) << " " << n1.numgb(maille) << " " << n2.numgb(maille)
        << endl;
 }

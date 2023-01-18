@@ -1,4 +1,8 @@
+#include <vector>
+
 #include "noeud.h"
+
+using namespace std;
 
 Noeud::Noeud(void) {}
 
@@ -7,9 +11,13 @@ Noeud::Noeud(int i, int j) {
   this->j = j;
 }
 
-double Noeud::getx(void) { return x; }
-
-double Noeud::gety(void) { return y; }
+Noeud::Noeud(int i, int j, Maillage maille) {
+  this->i = i;
+  this->j = j;
+  vector<vector<double>> S = maille.Subdiv();
+  this->x = S[0][i];
+  this->y = S[1][j];
+}
 
 Noeud::Noeud(int i, int j, double x, double y) {
   this->i = i;
@@ -18,26 +26,32 @@ Noeud::Noeud(int i, int j, double x, double y) {
   this->y = y;
 }
 
-int Noeud::numgb(int N, int M) { return (N + 1) * j + i; }
+double Noeud::getx(void) { return x; }
 
-void Noeud::invnumgb(int N, int M, int s) {
-  i = s % (N + 1);
-  j = s / (N + 1);
+double Noeud::gety(void) { return y; }
+
+int Noeud::numgb(Maillage maille) { return (maille.getN() + 1) * j + i; }
+
+void Noeud::invnumgb(Maillage maille, int s) {
+  i = s % (maille.getN() + 1);
+  j = s / (maille.getN() + 1);
 }
 
-int Noeud::numint(int N, int M) { return (N - 1) * (j - 1) + (i - 1); }
-
-void Noeud::invumint(int N, int M, int k) {
-  i = k % (N - 1) + 1;
-  j = k / (N - 1) + 1;
+int Noeud::numint(Maillage maille) {
+  return (maille.getN() - 1) * (j - 1) + (i - 1);
 }
 
-int Noeud::num_int_gb(int N, int M, int k) {
-  invumint(N, M, k);
-  return numgb(N, M);
+void Noeud::invumint(Maillage maille, int k) {
+  i = k % (maille.getN() - 1) + 1;
+  j = k / (maille.getN() - 1) + 1;
 }
 
-int Noeud::num_gb_int(int N, int M, int s) {
-  invnumgb(N, M, s);
-  return numint(N, M);
+int Noeud::num_int_gb(Maillage maille, int k) {
+  invumint(maille, k);
+  return numgb(maille);
+}
+
+int Noeud::num_gb_int(Maillage maille, int s) {
+  invnumgb(maille, s);
+  return numint(maille);
 }

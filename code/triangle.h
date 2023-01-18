@@ -1,5 +1,10 @@
-#include "noeud.h"
+#ifndef TRIANGLE_H
+#define TRIANGLE_H
+
 #include <vector>
+
+#include "maillage.h"
+#include "noeud.h"
 
 using namespace std;
 
@@ -32,5 +37,7 @@ public:
   vector<vector<double>> ReacTerm(void);
 
   // Affiche les numéros globaux des sommets du triangle.
-  void affiche_sommets_glb(int N, int M);
+  void affiche_sommets_glb(Maillage maille);
 };
+
+#endif
