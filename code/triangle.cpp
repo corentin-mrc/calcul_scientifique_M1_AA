@@ -33,9 +33,6 @@ vector<vector<double>> Triangle::InvMatBT(void) {
 vector<vector<double>> Triangle::DiffTerm(void) {
   vector<vector<double>> BI = InvMatBT();
   double d = DetMatBT() / 2;
-  //double d1 = pow(BI[0][0] + BI[0][1], 2) * d;
-  //double d2 = pow(BI[1][0] + BI[1][1], 2) * d;
-  //return {{d1 + d2, -d1, -d2}, {-d1, d1, 0}, {-d2, 0, d2}};
   double d1 = BI[0][0] + BI[1][0];
   double d2 = BI[0][1] + BI[1][1];
   double m00 = (d1 * d1 + d2 * d2) * d;
