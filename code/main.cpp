@@ -56,6 +56,33 @@ vector<Triangle> maillageTR(Maillage maille) {
   return triangles;
 }
 
+vector<double> matvec(vector<double> v, vector<Triangle> triangles, Maillage maille) {
+	int N = maille.getN(), M = maille.getM();
+	VApprox V = VApprox(v, maille);
+	V.extendVec();
+	vector<double> vv = V.getvGlb();
+	vector<double> ww((N + 1) * (M + 1), 0);
+	for (Triangle T : triangles) {
+		vector<vector<double>> BT = T.CalcMatBT();
+		vector<Noeud> noeuds = T.noeuds();
+		for (int i = 0; i <3 ; i++) {
+			Noeud ns = noeuds[i];
+			int s = ns.numgb(maille);
+			double res = 0;
+			for (int j = 0; j <3 ; j++) {
+				Noeud nr = noeuds[j];
+				int r = nr.numgb(maille);
+				double prod2 = epsilon * T.DiffTerm()[j][i] + gama * T.ConvectTerm()[j][i] + lambda * T.ReacTerm()[j][i];
+				res += vv[r] * prod2;
+			}
+			ww[s] += res;
+		}
+	}
+	V.setvGlb(ww);
+	V.IntVec();
+	return V.getvInt();
+}
+
 int main(void) {
   // Un petit test pour les noeuds.
   int N = 5;
@@ -82,7 +109,7 @@ int main(void) {
 
   // Un petit test pour VApprox
   vector<double> vInt = {1, 3, 2, 4, 5, 9, 0, 8, 6, 7, 4, 5};
-  VApprox v = VApprox(m, vInt);
+  VApprox v = VApprox(vInt, m);
   v.extendVec();
   vector<double> vGlb = v.getvGlb();
   for (int j = M; j >= 0; j--) {

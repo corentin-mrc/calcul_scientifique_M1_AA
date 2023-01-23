@@ -8,9 +8,9 @@ using namespace std;
 
 VApprox::VApprox(void) {}
 
-VApprox::VApprox(Maillage maille, vector<double> vInt) {
-  this->maille = maille;
+VApprox::VApprox(vector<double> vInt, Maillage maille) {
   this->vInt = vInt;
+  this->maille = maille;
 }
 
 vector<double> VApprox::getvInt(void) {
@@ -19,6 +19,10 @@ vector<double> VApprox::getvInt(void) {
 
 vector<double> VApprox::getvGlb(void) {
 	return vGlb;
+}
+
+void VApprox::setvGlb(vector<double> vGlb) {
+	this->vGlb = vGlb;
 }
 
 void VApprox::extendVec(void) {

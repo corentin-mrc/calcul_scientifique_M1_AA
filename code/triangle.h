@@ -35,6 +35,9 @@ public:
   vector<vector<double>> ConvectTerm(void);
 
   vector<vector<double>> ReacTerm(void);
+  
+  // retourne les noeuds
+  vector<Noeud> noeuds(void);
 
   // Affiche les numéros globaux des sommets du triangle.
   void affiche_sommets_glb(Maillage maille);

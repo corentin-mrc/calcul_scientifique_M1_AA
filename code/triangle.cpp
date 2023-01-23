@@ -56,6 +56,10 @@ vector<vector<double>> Triangle::ReacTerm(void) {
   return {{r1, r2, r2}, {r2, r1, r1}, {r2, r1, r1}};
 }
 
+vector<Noeud> Triangle::noeuds(void) {
+	return {n0, n1, n2};
+}
+
 void Triangle::affiche_sommets_glb(Maillage maille) {
   cout << n0.numgb(maille) << " " << n1.numgb(maille) << " " << n2.numgb(maille)
        << endl;
