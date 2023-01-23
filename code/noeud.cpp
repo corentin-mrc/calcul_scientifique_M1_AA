@@ -14,9 +14,8 @@ Noeud::Noeud(int i, int j) {
 Noeud::Noeud(int i, int j, Maillage maille) {
   this->i = i;
   this->j = j;
-  vector<vector<double>> S = maille.Subdiv();
-  this->x = S[0][i];
-  this->y = S[1][j];
+  this->x = 2 * i * maille.geta() / maille.getN();
+  this->y = 2 * j * maille.getb() / maille.getM();
 }
 
 Noeud::Noeud(int i, int j, double x, double y) {

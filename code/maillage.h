@@ -21,6 +21,8 @@ public:
   // Getters.
   int getN(void);
   int getM(void);
+  double geta(void);
+  double getb(void);
 
   // Question 9:
   // Retourne une subdivision uniforme de [-a, a] en N + 1 points et de [-b, b]

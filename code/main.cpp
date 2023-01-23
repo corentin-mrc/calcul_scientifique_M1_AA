@@ -5,6 +5,7 @@
 #include "maillage.h"
 #include "noeud.h"
 #include "triangle.h"
+#include "vApprox.h"
 
 using namespace std;
 
@@ -79,5 +80,23 @@ int main(void) {
   Triangle t(Noeud(0, 0, m), Noeud(1, 0, m), Noeud(0, 1, m));
   cout << t.DetMatBT() << endl;
 
+  // Un petit test pour VApprox
+  vector<double> vInt = {1, 3, 2, 4, 5, 9, 0, 8, 6, 7, 4, 5};
+  VApprox v = VApprox(m, vInt);
+  v.extendVec();
+  vector<double> vGlb = v.getvGlb();
+  for (int j = M; j >= 0; j--) {
+	  for (int i = 0; i <= N; i++) {
+		  cout << vGlb[(N + 1) * j + i] << " ";
+	  }
+	  cout << endl;
+  }
+  cout << endl;
+  v.IntVec();
+  for (int i = 0; i < (N - 1) * (M - 1); i++) {
+	  if (vInt[i] != v.getvInt()[i]) {
+		  cout << "erreur IntVec, v.vInt[" << i << "] = " << v.getvInt()[i] << " , vInt[" << i << "] = " << vInt[i] << endl;
+	  }
+  }
   return 0;
 }

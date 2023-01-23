@@ -15,6 +15,10 @@ int Maillage::getN(void) { return N; }
 
 int Maillage::getM(void) { return M; }
 
+double Maillage::geta(void) { return a; }
+
+double Maillage::getb(void) { return b; }
+
 vector<vector<double>> Maillage::Subdiv(void) {
   vector<double> xi;
   for (int i = 0; i <= N; i++)
