@@ -62,9 +62,9 @@ vector<double> matvec(vector<double> v, vector<Triangle> triangles, Maillage mai
 	V.extendVec();
 	vector<double> vv = V.getvGlb();
 	vector<double> ww((N + 1) * (M + 1), 0);
-	for (Triangle T : triangles) {
-		vector<vector<double>> BT = T.CalcMatBT();
-		vector<Noeud> noeuds = T.noeuds();
+	for (Triangle triangle : triangles) {
+		vector<vector<double>> BT = triangle.CalcMatBT();
+		vector<Noeud> noeuds = triangle.getNoeuds();
 		for (int i = 0; i <3 ; i++) {
 			Noeud ns = noeuds[i];
 			int s = ns.numgb(maille);
@@ -72,7 +72,7 @@ vector<double> matvec(vector<double> v, vector<Triangle> triangles, Maillage mai
 			for (int j = 0; j <3 ; j++) {
 				Noeud nr = noeuds[j];
 				int r = nr.numgb(maille);
-				double prod2 = epsilon * T.DiffTerm()[j][i] + gama * T.ConvectTerm()[j][i] + lambda * T.ReacTerm()[j][i];
+				double prod2 = epsilon * triangle.DiffTerm()[j][i] + gama * triangle.ConvectTerm()[j][i] + lambda * triangle.ReacTerm()[j][i];
 				res += vv[r] * prod2;
 			}
 			ww[s] += res;
@@ -83,35 +83,61 @@ vector<double> matvec(vector<double> v, vector<Triangle> triangles, Maillage mai
 	return V.getvInt();
 }
 
+vector<double> scdmembre(double (*rhfs)(double, double), vector<Triangle> triangles, Maillage maille) {
+	int N = maille.getN(), M = maille.getM();
+	vector<double> B((N + 1) * (M + 1), 0);
+	for (Triangle triangle : triangles) {
+		vector<Noeud> noeuds = triangle.getNoeuds();
+		for (int i = 0; i <3 ; i++) {
+			if (!noeuds[i].est_sur_le_bord(maille)) {
+				vector<vector<double>> BT = triangle.CalcMatBT({i, (i + 1) % 3, (i + 2) % 3});
+				double res = 0;
+				vector<double> FT = {BT[0][0] / 2 + noeuds[i].getx(), BT[1][0] / 2 + noeuds[i].gety()};
+				res += rhfs(FT[0], FT[1]) / 12;
+				FT = {BT[0][1] / 2 + noeuds[i].getx(), BT[1][1] / 2 + noeuds[i].gety()};
+				res += rhfs(FT[0], FT[1]) / 12;
+				B[noeuds[i].numint(maille)] += res;
+			}
+		}
+	}
+	return B;
+}
+
+double rhfs_test(double x, double y) {
+	return 2 * x * x * x + 3 * y * y * y + 5 * x * y * y + 1;
+}
+
 int main(void) {
   // Un petit test pour les noeuds.
   int N = 5;
   int M = 4;
-  Maillage m(N, M, 10, 10);
-  Noeud n(1, 2, m);
-  cout << n.numgb(m) << endl;
-  cout << n.numint(m) << endl;
-  cout << n.num_gb_int(m, 21) << endl;
-  cout << n.num_int_gb(m, 6) << endl;
+  int I = (N - 1) * (M - 1);
+  //int G = (N + 1) * (M + 1);
+  Maillage maille(N, M, 10, 10);
+  Noeud noeud(1, 2, maille);
+  cout << noeud.numgb(maille) << endl;
+  cout << noeud.numint(maille) << endl;
+  cout << noeud.num_gb_int(maille, 21) << endl;
+  cout << noeud.num_int_gb(maille, 6) << endl;
 
   cout << endl;
 
   // Un petit test pour la triangulation.
-  vector<Triangle> triangulation = maillageTR(m);
+  vector<Triangle> triangulation = maillageTR(maille);
   cout << "Test de la triangulation pour N = " << N << " et M = " << M << endl;
   for (Triangle triangle : triangulation)
-    triangle.affiche_sommets_glb(m);
+    triangle.affiche_sommets_glb(maille);
   cout << "Il y a " << triangulation.size() << " triangles." << endl;
 
   cout << endl;
-  Triangle t(Noeud(0, 0, m), Noeud(1, 0, m), Noeud(0, 1, m));
-  cout << t.DetMatBT() << endl;
+  Triangle triangle(Noeud(0, 0, maille), Noeud(1, 0, maille), Noeud(0, 1, maille));
+  cout << triangle.DetMatBT() << endl;
 
   // Un petit test pour VApprox
   vector<double> vInt = {1, 3, 2, 4, 5, 9, 0, 8, 6, 7, 4, 5};
-  VApprox v = VApprox(vInt, m);
-  v.extendVec();
-  vector<double> vGlb = v.getvGlb();
+  VApprox vec = VApprox(vInt, maille);
+  vec.extendVec();
+  vector<double> vGlb = vec.getvGlb();
   for (int j = M; j >= 0; j--) {
 	  for (int i = 0; i <= N; i++) {
 		  cout << vGlb[(N + 1) * j + i] << " ";
@@ -119,11 +145,15 @@ int main(void) {
 	  cout << endl;
   }
   cout << endl;
-  v.IntVec();
+  vec.IntVec();
   for (int i = 0; i < (N - 1) * (M - 1); i++) {
-	  if (vInt[i] != v.getvInt()[i]) {
-		  cout << "erreur IntVec, v.vInt[" << i << "] = " << v.getvInt()[i] << " , vInt[" << i << "] = " << vInt[i] << endl;
+	  if (vInt[i] != vec.getvInt()[i]) {
+		  cout << "erreur IntVec, v.vInt[" << i << "] = " << vec.getvInt()[i] << " , vInt[" << i << "] = " << vInt[i] << endl;
 	  }
   }
+  vector<double> vect_test = matvec(vec.getvInt(), maillageTR(maille), maille);
+  for (int i = 0; i < I; i++)
+	  cout << vect_test[i] << " ";
+  cout << endl;
   return 0;
 }
