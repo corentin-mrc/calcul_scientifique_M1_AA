@@ -20,7 +20,7 @@ public:
   Noeud(int i, int j, Maillage maille);
   Noeud(int i, int j, double x, double y);
 
-  // Getters
+  // Getters:
   double getx(void);
   double gety(void);
 
@@ -49,8 +49,8 @@ public:
   // Retourne le numéro intérieur d'un noeud à partir de son numéro global.
   // Met à jour les coordonnées en fonction du numéro global fourni.
   int num_gb_int(Maillage maille, int s);
-  
-  // Vérifie si le noeud est sur le bord
+
+  // Vérifie si le noeud est sur le bord.
   bool est_sur_le_bord(Maillage maille);
 };
 

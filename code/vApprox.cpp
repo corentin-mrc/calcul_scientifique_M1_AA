@@ -13,17 +13,11 @@ VApprox::VApprox(vector<double> vInt, Maillage maille) {
   this->maille = maille;
 }
 
-vector<double> VApprox::getvInt(void) {
-	return vInt;
-}
+vector<double> VApprox::getvInt(void) { return vInt; }
 
-vector<double> VApprox::getvGlb(void) {
-	return vGlb;
-}
+vector<double> VApprox::getvGlb(void) { return vGlb; }
 
-void VApprox::setvGlb(vector<double> vGlb) {
-	this->vGlb = vGlb;
-}
+void VApprox::setvGlb(vector<double> vGlb) { this->vGlb = vGlb; }
 
 void VApprox::extendVec(void) {
   vGlb = vector<double>();
@@ -34,19 +28,19 @@ void VApprox::extendVec(void) {
     vGlb.push_back(0);
     for (int i = 1; i < maille.getN(); i++) {
       vGlb.push_back(vInt[numInt]);
-	  numInt++;
+      numInt++;
     }
-	vGlb.push_back(0);
+    vGlb.push_back(0);
   }
   for (int i = 0; i <= maille.getN(); i++)
     vGlb.push_back(0);
 }
 
 void VApprox::IntVec(void) {
-	vInt = vector<double>();
-	for (int j = 1; j < maille.getM(); j++) {
-		for (int i = 1; i < maille.getN(); i++) {
-			vInt.push_back(vGlb[(maille.getN() + 1) * j + i]);
-		}
-	}
+  vInt = vector<double>();
+  for (int j = 1; j < maille.getM(); j++) {
+    for (int i = 1; i < maille.getN(); i++) {
+      vInt.push_back(vGlb[(maille.getN() + 1) * j + i]);
+    }
+  }
 }

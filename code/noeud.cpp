@@ -56,5 +56,5 @@ int Noeud::num_gb_int(Maillage maille, int s) {
 }
 
 bool Noeud::est_sur_le_bord(Maillage maille) {
-	return i == 0 || j == 0 || i == maille.getN() || j == maille.getM();
+  return i == 0 || j == 0 || i == maille.getN() || j == maille.getM();
 }

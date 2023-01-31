@@ -13,12 +13,12 @@ class Maillage {
   double b;
 
 public:
-  // Constructeur par défault.
+  // Constructeur par défault:
   Maillage(void);
-  // Constructeurs.
+  // Constructeur:
   Maillage(int N, int M, double a, double b);
 
-  // Getters.
+  // Getters:
   int getN(void);
   int getM(void);
   double geta(void);

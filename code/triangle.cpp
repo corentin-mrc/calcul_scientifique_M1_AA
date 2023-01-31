@@ -9,20 +9,25 @@ using namespace std;
 Triangle::Triangle(void) {}
 
 Triangle::Triangle(Noeud n0, Noeud n1, Noeud n2) {
-  this->n0 = n0;
-  this->n1 = n1;
-  this->n2 = n2;
   this->noeuds = {n0, n1, n2};
 }
 
+Triangle::Triangle(vector<Noeud> noeuds) { this->noeuds = noeuds; }
+
+vector<Noeud> Triangle::getNoeuds(void) { return noeuds; }
+
 vector<vector<double>> Triangle::CalcMatBT() {
-  return {{n1.getx() - n0.getx(), n2.getx() - n0.getx()},
-          {n1.gety() - n0.gety(), n2.gety() - n0.gety()}};
+  return {{noeuds[1].getx() - noeuds[0].getx(),
+           noeuds[2].getx() - noeuds[0].getx()},
+          {noeuds[1].gety() - noeuds[0].gety(),
+           noeuds[2].gety() - noeuds[0].gety()}};
 }
 
 vector<vector<double>> Triangle::CalcMatBT(vector<int> permut) {
-  return {{noeuds[permut[1]].getx() - noeuds[permut[0]].getx(), noeuds[permut[2]].getx() - noeuds[permut[0]].getx()},
-          {noeuds[permut[1]].gety() - noeuds[permut[0]].gety(), noeuds[permut[2]].gety() - noeuds[permut[0]].gety()}};
+  return {{noeuds[permut[1]].getx() - noeuds[permut[0]].getx(),
+           noeuds[permut[2]].getx() - noeuds[permut[0]].getx()},
+          {noeuds[permut[1]].gety() - noeuds[permut[0]].gety(),
+           noeuds[permut[2]].gety() - noeuds[permut[0]].gety()}};
 }
 
 double Triangle::DetMatBT(void) {
@@ -62,11 +67,7 @@ vector<vector<double>> Triangle::ReacTerm(void) {
   return {{r1, r2, r2}, {r2, r1, r1}, {r2, r1, r1}};
 }
 
-vector<Noeud> Triangle::getNoeuds(void) {
-	return noeuds;
-}
-
 void Triangle::affiche_sommets_glb(Maillage maille) {
-  cout << n0.numgb(maille) << " " << n1.numgb(maille) << " " << n2.numgb(maille)
-       << endl;
+  cout << noeuds[0].numgb(maille) << " " << noeuds[1].numgb(maille) << " "
+       << noeuds[2].numgb(maille) << endl;
 }
