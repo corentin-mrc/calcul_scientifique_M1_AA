@@ -69,12 +69,10 @@ vector<double> matvec(vector<double> v, vector<Triangle> triangles,
     vector<vector<double>> BT = triangle.CalcMatBT();
     vector<Noeud> noeuds = triangle.getNoeuds();
     for (int i = 0; i < 3; i++) {
-      Noeud ns = noeuds[i];
-      int s = ns.numgb(maille);
+      int s = noeuds[i].numgb(maille);
       double res = 0;
       for (int j = 0; j < 3; j++) {
-        Noeud nr = noeuds[j];
-        int r = nr.numgb(maille);
+        int r = noeuds[j].numgb(maille);
         double prod2 = epsilon * triangle.DiffTerm()[j][i] +
                        gama * triangle.ConvectTerm()[j][i] +
                        lambda * triangle.ReacTerm()[j][i];
@@ -93,7 +91,7 @@ vector<double> matvec(vector<double> v, vector<Triangle> triangles,
 vector<double> scdmembre(double (*rhfs)(double, double),
                          vector<Triangle> triangles, Maillage maille) {
   int N = maille.getN(), M = maille.getM();
-  vector<double> B((N + 1) * (M + 1), 0);
+  vector<double> B((N - 1) * (M - 1), 0);
   for (Triangle triangle : triangles) {
     vector<Noeud> noeuds = triangle.getNoeuds();
     for (int i = 0; i < 3; i++) {
@@ -122,7 +120,7 @@ int main(void) {
   // Un petit test pour les noeuds.
   int N = 5;
   int M = 4;
-  // int I = (N - 1) * (M - 1);
+  int I = (N - 1) * (M - 1);
   // int G = (N + 1) * (M + 1);
   Maillage maille(N, M, 10, 10);
   Noeud noeud(1, 2, maille);
@@ -158,7 +156,7 @@ int main(void) {
   }
   cout << endl;
   vec.IntVec();
-  for (int i = 0; i < (N - 1) * (M - 1); i++) {
+  for (int i = 0; i < I; i++) {
     if (vInt[i] != vec.getvInt()[i]) {
       cout << "erreur IntVec, v.vInt[" << i << "] = " << vec.getvInt()[i]
            << " , vInt[" << i << "] = " << vInt[i] << endl;
@@ -176,6 +174,12 @@ int main(void) {
   for (double b : B)
     cout << b << " ";
   cout << endl;
+  
+  // Un petit test pour la norme L2.
+  cout << vec.normL2(triangulation) << endl;
+  
+  // Un petit test pour la norme L2 grad.
+  cout << vec.normL2Grad(triangulation) << endl;
 
   return 0;
 }
