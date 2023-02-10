@@ -9,6 +9,45 @@
 
 using namespace std;
 
+// on définit l'addition de 2 vecteur de double (ils doivent être de même taille)
+vector<double> operator+(vector<double> A, vector<double> B)
+{
+	vector<double> C;
+    for(unsigned int i = 0; i < B.size(); i++)
+        C.push_back(A[i] + B[i]);
+    return C;
+}
+
+
+// on définit la soustraction de 2 vecteur de double (ils doivent être de même taille)
+vector<double> operator-(vector<double> A, vector<double> B)
+{
+	vector<double> C;
+    for(unsigned int i = 0; i < B.size(); i++)
+        C.push_back(A[i] - B[i]);
+    return C;
+}
+
+
+// on définit le produit d'un vecteur de double avec un double
+vector<double> operator*(double a, vector<double> B)
+{
+	vector<double> C;
+    for(unsigned int i = 0; i < B.size(); i++)
+        C.push_back(a * B[i]);
+    return C;
+}
+
+// on définit le produit scalaire de 2 vecteur de double (ils doivent être de même taille)
+double operator*(vector<double> A, vector<double> B)
+{
+	double C;
+    for(unsigned int i = 0; i < B.size(); i++)
+        C += A[i] * B[i];
+    return C;
+}
+
+
 // Question 3:
 // Retourne f_eta (x, y).
 double fsecond_membre(double (*ug)(double), double (*ud)(double),
@@ -111,6 +150,28 @@ vector<double> scdmembre(double (*rhfs)(double, double),
   return B;
 }
 
+vector<double> inv_syst(vector<double> B_eta, vector<Triangle> triangles, Maillage maille, int max_iteration) {
+	vector<double> X0(B_eta.size(), 1);
+	vector<double> R0 = B_eta - matvec(X0, triangles, maille);
+	vector<double> R0_etoile = R0;
+	vector<double> W0 = R0;
+	for (int j = 0; j < max_iteration; j++) {
+		vector<double> AW0 = matvec(W0, triangles, maille);
+		double alpha0 = (R0 * R0_etoile) / (AW0 * R0_etoile);
+		vector<double> S0 = R0 - (alpha0 * AW0);
+		vector<double> AS0 = matvec(S0, triangles, maille);
+		double omega0 = (AS0 * S0) / (AS0 * AS0);
+		vector<double> X1 = X0 + (alpha0 * W0) + (omega0 * S0);
+		vector<double> R1 = S0 - (omega0 * AS0);
+		double beta0 = ((R1 * R0_etoile) / (R0 * R0_etoile)) * (alpha0 / omega0);
+		vector<double> W1 = R1 + (beta0 * (W0 - (omega0 * AW0)));
+		R0 = R1;
+		W0 = W1;
+		X0 = X1;
+	}
+	return X0;
+}
+
 // Fonction pour les tests.
 double rhfs_test(double x, double y) {
   return 2 * x * x * x + 3 * y * y * y + 5 * x * y * y + 1;
@@ -180,6 +241,21 @@ int main(void) {
   
   // Un petit test pour la norme L2 grad.
   cout << vec.normL2Grad(triangulation) << endl;
+  
+  vector<double> victor = {1, 2, 3, 4, 5};
+  vector<double> victoire = {6, 1, 0, -2, -12};
+  
+  vector<double> adrien = victor + victoire;
+  double guy = victor * victoire;
+  vector<double> pascal = 3.14 * victoire;
+  
+  
+  for (int i = 0; i < 5; i++)
+	  cout << victor[i] << "\t+\t" << victoire[i] << "\t=\t" << adrien[i] << endl;
+  cout << "produit scalaire : " << guy << endl;
+  for (int i = 0; i < 5; i++)
+	  cout << "3.14\t*\t" << victoire[i] << "\t=\t" << pascal[i] << endl;
+  cout << endl;
 
   return 0;
 }
