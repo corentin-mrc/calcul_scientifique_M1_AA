@@ -14,36 +14,36 @@ Triangle::Triangle(Noeud n0, Noeud n1, Noeud n2) {
 
 Triangle::Triangle(vector<Noeud> noeuds) { this->noeuds = noeuds; }
 
-vector<Noeud> Triangle::getNoeuds(void) { return noeuds; }
+vector<Noeud> Triangle::get_noeuds(void) { return noeuds; }
 
-vector<vector<double>> Triangle::CalcMatBT() {
-  return {{noeuds[1].getx() - noeuds[0].getx(),
-           noeuds[2].getx() - noeuds[0].getx()},
-          {noeuds[1].gety() - noeuds[0].gety(),
-           noeuds[2].gety() - noeuds[0].gety()}};
+vector<vector<double>> Triangle::calc_mat_BT() {
+  return {{noeuds[1].get_x() - noeuds[0].get_x(),
+           noeuds[2].get_x() - noeuds[0].get_x()},
+          {noeuds[1].get_y() - noeuds[0].get_y(),
+           noeuds[2].get_y() - noeuds[0].get_y()}};
 }
 
-vector<vector<double>> Triangle::CalcMatBT(vector<int> permut) {
-  return {{noeuds[permut[1]].getx() - noeuds[permut[0]].getx(),
-           noeuds[permut[2]].getx() - noeuds[permut[0]].getx()},
-          {noeuds[permut[1]].gety() - noeuds[permut[0]].gety(),
-           noeuds[permut[2]].gety() - noeuds[permut[0]].gety()}};
+vector<vector<double>> Triangle::calc_mat_BT(vector<int> permut) {
+  return {{noeuds[permut[1]].get_x() - noeuds[permut[0]].get_x(),
+           noeuds[permut[2]].get_x() - noeuds[permut[0]].get_x()},
+          {noeuds[permut[1]].get_y() - noeuds[permut[0]].get_y(),
+           noeuds[permut[2]].get_y() - noeuds[permut[0]].get_y()}};
 }
 
-double Triangle::DetMatBT(void) {
-  vector<vector<double>> BT = CalcMatBT();
+double Triangle::det_mat_BT(void) {
+  vector<vector<double>> BT = calc_mat_BT();
   return BT[0][0] * BT[1][1] - BT[0][1] * BT[1][0];
 }
 
-vector<vector<double>> Triangle::InvMatBT(void) {
-  vector<vector<double>> BT = CalcMatBT();
-  double det = DetMatBT();
+vector<vector<double>> Triangle::inv_mat_BT(void) {
+  vector<vector<double>> BT = calc_mat_BT();
+  double det = det_mat_BT();
   return {{BT[1][1] / det, -BT[0][1] / det}, {-BT[1][0] / det, BT[0][0] / det}};
 }
 
-vector<vector<double>> Triangle::DiffTerm(void) {
-  vector<vector<double>> BI = InvMatBT();
-  double d = DetMatBT() / 2;
+vector<vector<double>> Triangle::diff_term(void) {
+  vector<vector<double>> BI = inv_mat_BT();
+  double d = det_mat_BT() / 2;
   double d1 = BI[0][0] + BI[1][0];
   double d2 = BI[0][1] + BI[1][1];
   double m00 = (d1 * d1 + d2 * d2) * d;
@@ -55,19 +55,14 @@ vector<vector<double>> Triangle::DiffTerm(void) {
   return {{m00, m01, m02}, {m01, m11, m12}, {m02, m12, m22}};
 }
 
-vector<vector<double>> Triangle::ConvectTerm(void) {
-  double c = abs(DetMatBT()) / 6;
+vector<vector<double>> Triangle::convect_term(void) {
+  double c = abs(det_mat_BT()) / 6;
   return {{-c, -c, -c}, {c, c, c}, {0, 0, 0}};
 }
 
-vector<vector<double>> Triangle::ReacTerm(void) {
-  double det = abs(DetMatBT());
+vector<vector<double>> Triangle::react_term(void) {
+  double det = abs(det_mat_BT());
   double r1 = det / 12;
   double r2 = det / 24;
   return {{r1, r2, r2}, {r2, r1, r1}, {r2, r1, r1}};
-}
-
-void Triangle::affiche_sommets_glb(Maillage maille) {
-  cout << noeuds[0].numgb(maille) << " " << noeuds[1].numgb(maille) << " "
-       << noeuds[2].numgb(maille) << endl;
 }
