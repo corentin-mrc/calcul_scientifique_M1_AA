@@ -208,12 +208,10 @@ vector<double> erreurs(double (*sol_exa)(double, double),
 }
 
 double u_eta(double x, double y) {
-  double A = 1 / 2 *
-             (gama / epsilon -
-              sqrt(gama * gama + 4 * M_PI * M_PI + 4 * lambda / epsilon));
-  double B = 1 / 2 *
-             (gama / epsilon +
-              sqrt(gama * gama + 4 * M_PI * M_PI + 4 * lambda / epsilon));
+  double A = (gama / epsilon -
+              sqrt(gama * gama / epsilon / epsilon + 4 * M_PI * M_PI + 4 * lambda / epsilon)) / 2;
+  double B = (gama / epsilon +
+              sqrt(gama * gama / epsilon / epsilon + 4 * M_PI * M_PI + 4 * lambda / epsilon)) / 2;
   double C_1 = 1 / (exp(-A) - exp(A - 2 * B));
   double C_2 = 1 / (exp(-B) - exp(B - 2 * A));
   double U_x = C_1 * exp(A * x) + C_2 * exp(B * x);

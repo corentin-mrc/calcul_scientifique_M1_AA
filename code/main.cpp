@@ -21,14 +21,15 @@ double f_eta(double x, double y) {
 }
 
 int main(void) {
-  int N = 10, M = N;
+  int N = 25, M = N;
   double a = 1, b = a;
   Maillage maille(N, M, a, b);
   vector<double> B_eta = scd_membre(f_eta, maille);
   cout << "Le second membre est:" << endl;
   for (double i : B_eta)
     cout << i << endl;
-  vector<double> w_eta_h = inv_syst(B_eta, maille, 10);
+  // w_eta_h est la solution approchée.
+  vector<double> w_eta_h = inv_syst(B_eta, maille, 25);
   cout << endl << "La solution approchée est:" << endl;
   for (double i : w_eta_h)
     cout << i << endl;
@@ -36,5 +37,16 @@ int main(void) {
   vector<double> erreur = erreurs(u_eta, w_eta_h, maille);
   for (double err : erreur)
     cout << err << endl;
+  vector<double> solution_exacte;
+  int I = (N - 1) * (M - 1);
+  for (int k = 0; k < I; k++) {
+    vector<double> xy = maille.int_coord(k);
+    solution_exacte.push_back(u_eta(xy[0], xy[1]));
+  }
+  vector<double> ecart = solution_exacte - w_eta_h;
+  cout << endl << "sol exacte\tsol approchee\tecart" << endl;
+  for (int k = 0; k < I && k < 30; k++)
+	  cout << solution_exacte[k] << "   \t" << w_eta_h[k] << "   \t" << ecart[k] << endl;
+  cout << endl;
   return 0;
 }
