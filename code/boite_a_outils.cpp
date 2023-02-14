@@ -1,5 +1,11 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <iostream>
+
 #include "boite_a_outils.h"
 #include "donnees_du_probleme.h"
+
+using namespace std;
 
 vector<double> operator+(vector<double> A, vector<double> B) {
   vector<double> C;
@@ -29,14 +35,19 @@ double operator*(vector<double> A, vector<double> B) {
   return C;
 }
 
-// Question 3:
-// Retourne f_eta (x, y).
-double f_second_membre(double (*ug)(double), double (*ud)(double),
-                       double (*ugpp)(double), double (*udpp)(double), double x,
-                       double y, double a) {
-  return (epsilon * (a - x) * ugpp(y) + epsilon * (a + x) * udpp(y) +
-          gama * ug(y) - gama * ud(y) - lambda * (a - x) * ug(y) -
-          lambda * (a + x) * ud(y)) /
+double max(vector<double> A) {
+  double max = 0;
+  for (double i : A)
+    max = i > 0 ? i > max ? i : max : -i > max ? -i : max;
+  return max;
+}
+
+double f_second_membre(double (*u_g)(double), double (*u_d)(double),
+                       double (*u_gpp)(double), double (*u_dpp)(double),
+                       double x, double y, double a) {
+  return (epsilon * (a - x) * u_gpp(y) + epsilon * (a + x) * u_dpp(y) +
+          gama * u_g(y) - gama * u_d(y) - lambda * (a - x) * u_g(y) -
+          lambda * (a + x) * u_d(y)) /
          (2 * a);
 }
 
@@ -180,4 +191,31 @@ vector<double> inv_syst(vector<double> B_eta, Maillage maille,
     X0 = X1;
   }
   return X0;
+}
+
+vector<double> erreurs(double (*sol_exa)(double, double),
+                       vector<double> sol_appr, Maillage maille) {
+  vector<double> w;
+  int I = (maille.get_N() - 1) * (maille.get_M() - 1);
+  for (int k = 0; k < I; k++) {
+    vector<double> xy = maille.int_coord(k);
+    w.push_back(sol_exa(xy[0], xy[1]));
+  }
+  vector<double> erreur = w - sol_appr;
+  return {norme_L2(erreur, maille) / norme_L2(w, maille),
+          norme_L2_grad(erreur, maille) / norme_L2_grad(w, maille),
+          max(erreur) / max(w)};
+}
+
+double u_eta(double x, double y) {
+  double A = 1 / 2 *
+             (gama / epsilon -
+              sqrt(gama * gama + 4 * M_PI * M_PI + 4 * lambda / epsilon));
+  double B = 1 / 2 *
+             (gama / epsilon +
+              sqrt(gama * gama + 4 * M_PI * M_PI + 4 * lambda / epsilon));
+  double C_1 = 1 / (exp(-A) - exp(A - 2 * B));
+  double C_2 = 1 / (exp(-B) - exp(B - 2 * A));
+  double U_x = C_1 * exp(A * x) + C_2 * exp(B * x);
+  return U_x * sin(M_PI * y);
 }

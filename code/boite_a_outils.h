@@ -23,11 +23,14 @@ vector<double> operator*(double a, vector<double> B);
 // même taille).
 double operator*(vector<double> A, vector<double> B);
 
+// Retourne la plus grande valeur absolue du vecteur.
+double max(vector<double> A);
+
 // Question 3:
 // Retourne f_eta (x, y).
-double f_second_membre(double (*ug)(double), double (*ud)(double),
-                       double (*ugpp)(double), double (*udpp)(double), double x,
-                       double y, double a);
+double f_second_membre(double (*u_g)(double), double (*u_d)(double),
+                       double (*u_gpp)(double), double (*u_dpp)(double),
+                       double x, double y, double a);
 
 // Question 43.d:
 // Calcule la prolongation du vecteur des noeuds intérieurs sur tous les
@@ -40,11 +43,11 @@ vector<double> extend_vec(vector<double> V_int, int M, int N);
 vector<double> int_vec(vector<double> V_glb, int M, int N);
 
 // Question 46.i:
-// Retourne la norme L2 de la fonction v associée au vecteur V.
+// Retourne la norme L2 de la fonction v associée au vecteur V de taille I.
 double norme_L2(vector<double> V, Maillage maille);
 
 // Question 46.j:
-// Retourne la norme L2 grad de la fonction v associée au vecteur V.
+// Retourne la norme L2 grad de la fonction v associée au vecteur V de taille I.
 double norme_L2_grad(vector<double> V, Maillage maille);
 
 // Question 44:
@@ -59,5 +62,13 @@ vector<double> scd_membre(double (*rhfs)(double, double), Maillage maille);
 // Retourne une solution approchée du système linéaire A_eta * X = B_eta.
 vector<double> inv_syst(vector<double> B_eta, Maillage maille,
                         int max_iteration);
+
+// Question 49:
+// Retournes les trois erreurs relatives.
+vector<double> erreurs(double (*sol_exa)(double, double),
+                       vector<double> sol_appr, Maillage maille);
+
+// TEMPORAIRE
+double u_eta(double x, double y);
 
 #endif

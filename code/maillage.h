@@ -65,6 +65,9 @@ public:
   // Vérifie si le noeud est sur le bord.
   bool est_sur_le_bord(Noeud noeud);
 
+  // Donne les coordonnées x et y à partir du numéro intérieur du noeud.
+  vector<double> int_coord(int k);
+
   // Question 20:
   // Initialise le tableau de triangle dont la l-ème ligne contient le triangle
   // T_l.

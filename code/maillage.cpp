@@ -73,6 +73,11 @@ int Maillage::num_int_noeud(Noeud noeud) {
   return this->num_int(i, j);
 }
 
+vector<double> Maillage::int_coord(int k) {
+  vector<int> ij = this->inv_num_int(k);
+  return {(2 * ij[0] - N) * a / N, (2 * ij[1] - M) * b / M};
+}
+
 void Maillage::init_maillage_TR(void) {
   // On génère la matrice des noeuds.
   vector<vector<Noeud>> noeuds;
