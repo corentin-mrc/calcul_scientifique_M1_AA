@@ -31,7 +31,7 @@ int main(void) {
   for (int k = 0; k < I && k < 30; k++)
     cout << B_eta[k] << endl;
   // w_eta_h est la solution approchée.
-  vector<double> w_eta_h = inv_syst(B_eta, maille, 100);
+  vector<double> w_eta_h = inv_syst(B_eta, maille, 5);
   cout << endl << "La solution approchée est:" << endl;
   for (int k = 0; k < I && k < 30; k++)
     cout << w_eta_h[k] << endl;

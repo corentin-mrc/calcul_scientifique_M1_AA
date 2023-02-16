@@ -35,9 +35,9 @@ public:
   vector<vector<double>> inv_mat_BT(void);
 
   // Question 37:
-  vector<vector<double>> diff_term(void);
-  vector<vector<double>> convect_term(void);
-  vector<vector<double>> react_term(void);
+  vector<vector<double>> diff_terme(void);
+  vector<vector<double>> convect_terme(void);
+  vector<vector<double>> react_terme(void);
 };
 
 #endif

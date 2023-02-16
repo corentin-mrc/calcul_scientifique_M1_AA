@@ -90,7 +90,7 @@ double norme_L2(vector<double> V, Maillage maille) {
       double res = 0;
       for (int j = 0; j < 3; j++) {
         int r = maille.num_gb_noeud(noeuds[j]);
-        res += V_glb[r] * triangle.react_term()[j][i];
+        res += V_glb[r] * triangle.react_terme()[j][i];
       }
       WW[s] += res;
     }
@@ -111,7 +111,7 @@ double norme_L2_grad(vector<double> V, Maillage maille) {
       double res = 0;
       for (int j = 0; j < 3; j++) {
         int r = maille.num_gb_noeud(noeuds[j]);
-        res += V_glb[r] * triangle.diff_term()[j][i];
+        res += V_glb[r] * triangle.diff_terme()[j][i];
       }
       WW[s] += res;
     }
@@ -132,9 +132,9 @@ vector<double> mat_vec(vector<double> V, Maillage maille) {
       double res = 0;
       for (int j = 0; j < 3; j++) {
         int r = maille.num_gb_noeud(noeuds[j]);
-        double prod2 = epsilon * triangle.diff_term()[j][i] +
-                       gama * triangle.convect_term()[j][i] +
-                       lambda * triangle.react_term()[j][i];
+        double prod2 = epsilon * triangle.diff_terme()[j][i] +
+                       gama * triangle.convect_terme()[j][i] +
+                       lambda * triangle.react_terme()[j][i];
         res += VV[r] * prod2;
       }
       WW[s] += res;
