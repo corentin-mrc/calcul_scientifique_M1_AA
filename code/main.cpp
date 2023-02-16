@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -30,7 +31,7 @@ int main(void) {
   for (int k = 0; k < I && k < 30; k++)
     cout << B_eta[k] << endl;
   // w_eta_h est la solution approchée.
-  vector<double> w_eta_h = inv_syst(B_eta, maille, 25);
+  vector<double> w_eta_h = inv_syst(B_eta, maille, 100);
   cout << endl << "La solution approchée est:" << endl;
   for (int k = 0; k < I && k < 30; k++)
     cout << w_eta_h[k] << endl;
@@ -46,7 +47,24 @@ int main(void) {
   vector<double> ecart = solution_exacte - w_eta_h;
   cout << endl << "sol exacte\tsol approchee\tecart" << endl;
   for (int k = 0; k < I && k < 30; k++)
-	  cout << solution_exacte[k] << "   \t" << w_eta_h[k] << "   \t" << ecart[k] << endl;
+    cout << solution_exacte[k] << "   \t" << w_eta_h[k] << "   \t" << ecart[k]
+         << endl;
   cout << endl;
+
+  // Ecriture des fichiers:
+  ofstream file;
+
+  // Ecriture des solutions exactes:
+  file.open("solution_exacte.txt");
+  for (double d : solution_exacte)
+    file << d << endl;
+  file.close();
+
+  // Ecriture des solutions approchées:
+  file.open("solution_approchée.txt");
+  for (double d : w_eta_h)
+    file << d << endl;
+  file.close();
+
   return 0;
 }

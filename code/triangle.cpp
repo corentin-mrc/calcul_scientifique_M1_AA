@@ -43,7 +43,7 @@ vector<vector<double>> Triangle::inv_mat_BT(void) {
 
 vector<vector<double>> Triangle::diff_term(void) {
   vector<vector<double>> BI = inv_mat_BT();
-  double d = det_mat_BT() / 2;
+  double d = abs(det_mat_BT()) / 2;
   double d1 = BI[0][0] + BI[1][0];
   double d2 = BI[0][1] + BI[1][1];
   double m00 = (d1 * d1 + d2 * d2) * d;

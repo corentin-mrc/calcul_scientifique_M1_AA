@@ -9,28 +9,28 @@ using namespace std;
 
 vector<double> operator+(vector<double> A, vector<double> B) {
   vector<double> C;
-  for (unsigned int i = 0; i < B.size(); i++)
+  for (size_t i = 0; i < B.size(); ++i)
     C.push_back(A[i] + B[i]);
   return C;
 }
 
 vector<double> operator-(vector<double> A, vector<double> B) {
   vector<double> C;
-  for (unsigned int i = 0; i < B.size(); i++)
+  for (size_t i = 0; i < B.size(); ++i)
     C.push_back(A[i] - B[i]);
   return C;
 }
 
 vector<double> operator*(double a, vector<double> B) {
   vector<double> C;
-  for (unsigned int i = 0; i < B.size(); i++)
+  for (size_t i = 0; i < B.size(); ++i)
     C.push_back(a * B[i]);
   return C;
 }
 
 double operator*(vector<double> A, vector<double> B) {
   double C;
-  for (unsigned int i = 0; i < B.size(); i++)
+  for (size_t i = 0; i < B.size(); ++i)
     C += A[i] * B[i];
   return C;
 }
@@ -84,7 +84,6 @@ double norme_L2(vector<double> V, Maillage maille) {
   vector<double> V_glb = extend_vec(V, M, N);
   vector<double> WW((N + 1) * (M + 1), 0);
   for (Triangle triangle : maille.get_triangulation()) {
-    vector<vector<double>> BT = triangle.calc_mat_BT();
     vector<Noeud> noeuds = triangle.get_noeuds();
     for (int i = 0; i < 3; i++) {
       int s = maille.num_gb_noeud(noeuds[i]);
@@ -106,7 +105,6 @@ double norme_L2_grad(vector<double> V, Maillage maille) {
   vector<double> V_glb = extend_vec(V, M, N);
   vector<double> WW((N + 1) * (M + 1), 0);
   for (Triangle triangle : maille.get_triangulation()) {
-    vector<vector<double>> BT = triangle.calc_mat_BT();
     vector<Noeud> noeuds = triangle.get_noeuds();
     for (int i = 0; i < 3; i++) {
       int s = maille.num_gb_noeud(noeuds[i]);
@@ -128,7 +126,6 @@ vector<double> mat_vec(vector<double> V, Maillage maille) {
   vector<double> VV = extend_vec(V, M, N);
   vector<double> WW((N + 1) * (M + 1), 0);
   for (Triangle triangle : maille.get_triangulation()) {
-    vector<vector<double>> BT = triangle.calc_mat_BT();
     vector<Noeud> noeuds = triangle.get_noeuds();
     for (int i = 0; i < 3; i++) {
       int s = maille.num_gb_noeud(noeuds[i]);
@@ -208,10 +205,12 @@ vector<double> erreurs(double (*sol_exa)(double, double),
 }
 
 double u_eta(double x, double y) {
-  double A = (gama / epsilon -
-              sqrt(gama * gama / epsilon / epsilon + 4 * M_PI * M_PI + 4 * lambda / epsilon)) / 2;
-  double B = (gama / epsilon +
-              sqrt(gama * gama / epsilon / epsilon + 4 * M_PI * M_PI + 4 * lambda / epsilon)) / 2;
+  double A = (gama / epsilon - sqrt(gama * gama / epsilon / epsilon +
+                                    4 * M_PI * M_PI + 4 * lambda / epsilon)) /
+             2;
+  double B = (gama / epsilon + sqrt(gama * gama / epsilon / epsilon +
+                                    4 * M_PI * M_PI + 4 * lambda / epsilon)) /
+             2;
   double C_1 = 1 / (exp(-A) - exp(A - 2 * B));
   double C_2 = 1 / (exp(-B) - exp(B - 2 * A));
   double U_x = C_1 * exp(A * x) + C_2 * exp(B * x);
