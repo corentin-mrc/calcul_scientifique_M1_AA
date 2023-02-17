@@ -24,25 +24,33 @@ C2 = 1 / (exp(-B) - exp(B - 2 * A))
 def solution_exacte(x, y):
 	return (C1 * np.exp(A * x) + C2 * np.exp(B * x)) * np.sin(pi * y)
 
+def u_star(x, y):
+	return (a - x) * np.sin(pi * y) / (2 * a)
 
-filename = "solution_exacte.txt"
+
+filename = "solution_approchee.txt"
 with open(filename) as f:
     content = f.readlines()
     wk = []
     for line in content:
         if line != '' and line != '\n':
             wk.append(float(line))
+# w_eta_h de i et j
 fxy = [[0] * (M + 1) for i in range(N + 1)]
 for k in range(I):
 	i = (k % (N - 1)) + 1
 	j = (k // (N - 1)) + 1
-	fxy[i][j] = wk[k]
-xy = [[(0, 0)] * (M + 1) for i in range(N + 1)]
+	xi = a * (2 * i - N) / N
+	yj = b * (2 * j - M) / M
+	fxy[i][j] = wk[k] + u_star(xi, yj)
+X_a = [[0] * (M + 1) for i in range(N + 1)]
+Y_a = [[0] * (M + 1) for i in range(N + 1)]
 for i in range(N + 1):
 	xi = a * (2 * i - N) / N
 	for j in range(M + 1):
 		yj = b * (2 * j - M) / M
-		xy[i][j] = (xi, yj)
+		X_a[i][j] = xi
+		Y_a[i][j] = yj
 
 def f(x, y):
 	i = floor(N * (x + a) / (2 * a))
@@ -50,14 +58,14 @@ def f(x, y):
 	j = floor(M * (y + b) / (2 * b))
 	yj = (2 * j - M) * b / M
 	if (i + j) % 2 == 0:
-		i0 = i; j0 = j; x0 = xi; y0 = yi
+		i0 = i; j0 = j; x0 = xi; y0 = yj
 		if (x - x0) / h1 < (y - y0) / h2:
 			i1 = i0; j1 = j0 + 1; x1 = x0; y1 = y0 + h2
 		else:
 			i1 = i0 + 1; j1 = j0; x1 = x0 + h1; y1 = y0
 		i2 = i0 + 1; j2 = j0 + 1; x2 = x0 + h1; y2 = y0 + h2
 	else:
-		i0 = i + 1; j0 = j; x0 = xi + h1; y0 = yi
+		i0 = i + 1; j0 = j; x0 = xi + h1; y0 = yj
 		if (x0 - x) / h1 < (y - y0) / h2:
 			i1 = i0; j1 = j0 + 1; x1 = x0; y1 = y0 + h2
 		else:
@@ -73,17 +81,25 @@ def f(x, y):
 
 fig = plt.figure()
 
-xp = np.linspace(-a, a, 60)
-yp = np.linspace(-b, b, 60)
+nb_pt = 60
+xp = np.linspace(-a, a, nb_pt)
+yp = np.linspace(-b, b, nb_pt)
 
 X, Y = np.meshgrid(xp, yp)
-Z = solution_exacte(X, Y)
+Z = np.zeros((nb_pt, nb_pt))
+for i in range(nb_pt):
+	x = a * (2 * i - nb_pt) / nb_pt
+	for j in range(nb_pt):
+		y = b * (2 * j - nb_pt) / nb_pt
+#		Z[i][j] = f(x, y) + u_star(x, y)
+#		Z[i][j] = u_star(x, y)
 ax = plt.axes(projection='3d')
-ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+#ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+ax.plot_surface(np.array(X_a), np.array(Y_a), np.array(fxy), rstride=1, cstride=1, cmap='viridis', edgecolor='none')
 ax.set_title('solution exacte')
 ax.set_xlabel('x')
 ax.set_ylabel('y')
-ax.set_zlabel('u(x, y)');
+ax.set_zlabel('u(x, y)')
 
 
 plt.show()
