@@ -1,36 +1,29 @@
 #ifndef MAILLAGE_H
 #define MAILLAGE_H
 
+#include <vector>
+
+#include "donnees_du_probleme.h"
 #include "noeud.h"
 #include "triangle.h"
-#include <vector>
 
 using namespace std;
 
 class Maillage {
-  // Ensemble de travail.
-  double a, b;
   // Subdivisions.
-  int N, M;
   vector<Triangle> triangulation;
 
 public:
-  // Constructeur par défault.
-  Maillage(void);
   // Constructeur.
-  Maillage(int N, int M, double a, double b);
+  Maillage(void);
 
   // Getters.
-  int get_N(void);
-  int get_M(void);
-  double get_a(void);
-  double get_b(void);
   vector<Triangle> get_triangulation(void);
 
   // Question 9:
   // Retourne une subdivision uniforme de [-a, a] en N + 1 points et de [-b, b]
   // en M + 1 points.
-  static vector<double> sub_div(int a, int N);
+  static vector<double> sub_div(double largeur, int nb_divisions);
 
   // Question 11:
   // Retourne le numéro global associé aux indices i et j.

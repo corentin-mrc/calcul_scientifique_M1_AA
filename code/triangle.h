@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "donnees_du_probleme.h"
 #include "noeud.h"
 
 using namespace std;
@@ -23,13 +24,10 @@ public:
 
   // Question 31:
   // Retourne la matrice B_T du triangle.
-  vector<vector<double>> calc_mat_BT();
+  vector<vector<double>> calc_mat_BT(void);
 
   // Retourne la matrice B_T du triangle avec une permutation des sommets.
   vector<vector<double>> calc_mat_BT(vector<int> permut);
-
-  // Retourne le déterminant de la matrice B_T.
-  double det_mat_BT(void);
 
   // Retourne l'inverse de la matrice B_T.
   vector<vector<double>> inv_mat_BT(void);

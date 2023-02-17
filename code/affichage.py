@@ -58,7 +58,7 @@ def f(x, y):
 	xi = (2 * i - N) * a / N
 	j = floor(M * (y + b) / (2 * b))
 	yj = (2 * j - M) * b / M
-	if (i + j) % 2 == 0:
+	if not (i ^ j) & 1:
 		i0 = i; j0 = j; x0 = xi; y0 = yj
 		if (x - x0) / h1 < (y - y0) / h2:
 			i1 = i0; j1 = j0 + 1; x1 = x0; y1 = y0 + h2

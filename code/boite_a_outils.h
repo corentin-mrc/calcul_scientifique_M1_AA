@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "donnees_du_probleme.h"
 #include "maillage.h"
 #include "triangle.h"
 
@@ -17,7 +18,7 @@ vector<double> operator+(vector<double> A, vector<double> B);
 vector<double> operator-(vector<double> A, vector<double> B);
 
 // On définit le produit d'un vecteur de double avec un double.
-vector<double> operator*(double a, vector<double> B);
+vector<double> operator*(double scalaire, vector<double> B);
 
 // On définit le produit scalaire de 2 vecteur de double (ils doivent être de
 // même taille).
@@ -30,17 +31,17 @@ double max(vector<double> A);
 // Retourne f_eta (x, y).
 double f_second_membre(double (*u_g)(double), double (*u_d)(double),
                        double (*u_gpp)(double), double (*u_dpp)(double),
-                       double x, double y, double a);
+                       double x, double y);
 
 // Question 43.d:
 // Calcule la prolongation du vecteur des noeuds intérieurs sur tous les
 // noeuds.
-vector<double> extend_vec(vector<double> V_int, int M, int N);
+vector<double> extend_vec(vector<double> V_int);
 
 // Question 43.e:
 // Calcule la restriction du vecteur des noeuds globaux sur tous les noeuds
 // intérieurs.
-vector<double> int_vec(vector<double> V_glb, int M, int N);
+vector<double> int_vec(vector<double> V_glb);
 
 // Question 46.i:
 // Retourne la norme L2 de la fonction v associée au vecteur V de taille I.

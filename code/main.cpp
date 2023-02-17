@@ -5,11 +5,21 @@
 #include <vector>
 
 #include "boite_a_outils.h"
+#include "donnees_du_probleme.h"
 #include "maillage.h"
 #include "noeud.h"
 #include "triangle.h"
 
 using namespace std;
+
+double epsilon = 1;
+double gama = 1;
+double lambda = 1;
+double a = 1;
+double b = 1;
+int N = 25;
+int M = 25;
+double det = abs(2 * (a / N) * (b / M));
 
 double u_g(double y) { return sin(M_PI * y); }
 double u_gpp(double y) { return -M_PI * M_PI * sin(M_PI * y); }
@@ -18,14 +28,12 @@ double u_d(double y) { return 0; }
 double u_dpp(double y) { return 0; }
 
 double f_eta(double x, double y) {
-  return f_second_membre(u_g, u_d, u_gpp, u_dpp, x, y, 1);
+  return f_second_membre(u_g, u_d, u_gpp, u_dpp, x, y);
 }
 
 int main(void) {
-  int N = 25, M = N;
-  double a = 1, b = a;
   int I = (N - 1) * (M - 1);
-  Maillage maille(N, M, a, b);
+  Maillage maille;
   vector<double> B_eta = scd_membre(f_eta, maille);
   cout << "Le second membre est:" << endl;
   for (int k = 0; k < I && k < 30; k++)

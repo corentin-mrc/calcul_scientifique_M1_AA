@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "boite_a_outils.h"
-#include "donnees_du_probleme.h"
 
 using namespace std;
 
@@ -21,10 +20,10 @@ vector<double> operator-(vector<double> A, vector<double> B) {
   return C;
 }
 
-vector<double> operator*(double a, vector<double> B) {
+vector<double> operator*(double scalaire, vector<double> B) {
   vector<double> C;
   for (size_t i = 0; i < B.size(); ++i)
-    C.push_back(a * B[i]);
+    C.push_back(scalaire * B[i]);
   return C;
 }
 
@@ -44,14 +43,14 @@ double max(vector<double> A) {
 
 double f_second_membre(double (*u_g)(double), double (*u_d)(double),
                        double (*u_gpp)(double), double (*u_dpp)(double),
-                       double x, double y, double a) {
+                       double x, double y) {
   return (epsilon * (a - x) * u_gpp(y) + epsilon * (a + x) * u_dpp(y) +
           gama * u_g(y) - gama * u_d(y) - lambda * (a - x) * u_g(y) -
           lambda * (a + x) * u_d(y)) /
          (2 * a);
 }
 
-vector<double> extend_vec(vector<double> V_int, int M, int N) {
+vector<double> extend_vec(vector<double> V_int) {
   vector<double> V_glb;
   for (int i = 0; i <= N; i++)
     V_glb.push_back(0);
@@ -69,7 +68,7 @@ vector<double> extend_vec(vector<double> V_int, int M, int N) {
   return V_glb;
 }
 
-vector<double> int_vec(vector<double> V_glb, int M, int N) {
+vector<double> int_vec(vector<double> V_glb) {
   vector<double> V_int;
   for (int j = 1; j < M; j++) {
     for (int i = 1; i < N; i++)
@@ -79,9 +78,7 @@ vector<double> int_vec(vector<double> V_glb, int M, int N) {
 }
 
 double norme_L2(vector<double> V, Maillage maille) {
-  int N = maille.get_N();
-  int M = maille.get_M();
-  vector<double> V_glb = extend_vec(V, M, N);
+  vector<double> V_glb = extend_vec(V);
   vector<double> WW((N + 1) * (M + 1), 0);
   for (Triangle triangle : maille.get_triangulation()) {
     vector<Noeud> noeuds = triangle.get_noeuds();
@@ -95,14 +92,12 @@ double norme_L2(vector<double> V, Maillage maille) {
       WW[s] += res;
     }
   }
-  vector<double> AV = int_vec(WW, M, N);
+  vector<double> AV = int_vec(WW);
   return AV * V;
 }
 
 double norme_L2_grad(vector<double> V, Maillage maille) {
-  int N = maille.get_N();
-  int M = maille.get_M();
-  vector<double> V_glb = extend_vec(V, M, N);
+  vector<double> V_glb = extend_vec(V);
   vector<double> WW((N + 1) * (M + 1), 0);
   for (Triangle triangle : maille.get_triangulation()) {
     vector<Noeud> noeuds = triangle.get_noeuds();
@@ -116,14 +111,12 @@ double norme_L2_grad(vector<double> V, Maillage maille) {
       WW[s] += res;
     }
   }
-  vector<double> AV = int_vec(WW, M, N);
+  vector<double> AV = int_vec(WW);
   return AV * V;
 }
 
 vector<double> mat_vec(vector<double> V, Maillage maille) {
-  int N = maille.get_N();
-  int M = maille.get_M();
-  vector<double> VV = extend_vec(V, M, N);
+  vector<double> VV = extend_vec(V);
   vector<double> WW((N + 1) * (M + 1), 0);
   for (Triangle triangle : maille.get_triangulation()) {
     vector<Noeud> noeuds = triangle.get_noeuds();
@@ -140,12 +133,10 @@ vector<double> mat_vec(vector<double> V, Maillage maille) {
       WW[s] += res;
     }
   }
-  return int_vec(WW, M, N);
+  return int_vec(WW);
 }
 
 vector<double> scd_membre(double (*rhfs)(double, double), Maillage maille) {
-  int N = maille.get_N();
-  int M = maille.get_M();
   vector<double> B((N - 1) * (M - 1), 0);
   for (Triangle triangle : maille.get_triangulation()) {
     vector<Noeud> noeuds = triangle.get_noeuds();
@@ -154,15 +145,15 @@ vector<double> scd_membre(double (*rhfs)(double, double), Maillage maille) {
         vector<vector<double>> BT =
             triangle.calc_mat_BT({i, (i + 1) % 3, (i + 2) % 3});
         double res = 0;
-		// FT(1/2, 0) = BT * (1/2, 0) + (x0, y0):
+        // FT(1/2, 0) = BT * (1/2, 0) + (x0, y0):
         vector<double> FT = {BT[0][0] / 2 + noeuds[i].get_x(),
                              BT[1][0] / 2 + noeuds[i].get_y()};
-		// wk(FT(1/2, 0)) = 1/2
+        // wk(FT(1/2, 0)) = 1/2
         res += rhfs(FT[0], FT[1]) / 12;
-		// FT(0, 1/2) = BT * (0, 1/2) + (x0, y0):
+        // FT(0, 1/2) = BT * (0, 1/2) + (x0, y0):
         FT = {BT[0][1] / 2 + noeuds[i].get_x(),
               BT[1][1] / 2 + noeuds[i].get_y()};
-		// wk(FT(0, 1/2)) = 1/2
+        // wk(FT(0, 1/2)) = 1/2
         res += rhfs(FT[0], FT[1]) / 12;
         B[maille.num_int_noeud(noeuds[i])] += res;
       }
@@ -197,7 +188,7 @@ vector<double> inv_syst(vector<double> B_eta, Maillage maille,
 vector<double> erreurs(double (*sol_exa)(double, double),
                        vector<double> sol_appr, Maillage maille) {
   vector<double> w;
-  int I = (maille.get_N() - 1) * (maille.get_M() - 1);
+  int I = (N - 1) * (M - 1);
   for (int k = 0; k < I; k++) {
     vector<double> xy = maille.int_coord(k);
     w.push_back(sol_exa(xy[0], xy[1]));

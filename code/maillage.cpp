@@ -2,30 +2,14 @@
 
 #include "maillage.h"
 
-Maillage::Maillage(void) {}
-
-Maillage::Maillage(int N, int M, double a, double b) {
-  this->N = N;
-  this->M = M;
-  this->a = a;
-  this->b = b;
-  this->init_maillage_TR();
-}
-
-int Maillage::get_N(void) { return N; }
-
-int Maillage::get_M(void) { return M; }
-
-double Maillage::get_a(void) { return a; }
-
-double Maillage::get_b(void) { return b; }
+Maillage::Maillage(void) { this->init_maillage_TR(); }
 
 vector<Triangle> Maillage::get_triangulation(void) { return triangulation; }
 
-vector<double> Maillage::sub_div(int a, int N) {
+vector<double> Maillage::sub_div(double largeur, int nb_divisions) {
   vector<double> xi;
-  for (int i = 0; i <= N; i++)
-    xi.push_back(-a + (2 * i * a) / N);
+  for (int i = 0; i <= nb_divisions; i++)
+    xi.push_back(-largeur + (2 * i * largeur) / nb_divisions);
   return xi;
 }
 
@@ -92,20 +76,20 @@ void Maillage::init_maillage_TR(void) {
   }
   for (int j = 0; j < M; j++) {
     for (int i = 0; i < N; i++) {
-      Noeud a = noeuds[i][j];
-      Noeud b = noeuds[i + 1][j];
-      Noeud c = noeuds[i][j + 1];
-      Noeud d = noeuds[i + 1][j + 1];
+      Noeud SO = noeuds[i][j];
+      Noeud SE = noeuds[i + 1][j];
+      Noeud NO = noeuds[i][j + 1];
+      Noeud NE = noeuds[i + 1][j + 1];
       // Il y a 2 configurations possibles en fonction de la position du
       // rectangle du maillage qui nous intéresse. Dans chaque cas, il
       // faut déterminer les sommets du rectangle et les placer dans un
       // certain ordre.
       if ((i ^ j) & 1) {
-        triangulation.push_back(Triangle(a, b, c));
-        triangulation.push_back(Triangle(b, c, d));
+        triangulation.push_back(Triangle(SO, SE, NO));
+        triangulation.push_back(Triangle(SE, NO, NE));
       } else {
-        triangulation.push_back(Triangle(a, c, d));
-        triangulation.push_back(Triangle(a, b, d));
+        triangulation.push_back(Triangle(SO, NO, NE));
+        triangulation.push_back(Triangle(SO, SE, NE));
       }
     }
   }
