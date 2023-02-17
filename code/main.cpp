@@ -61,7 +61,7 @@ int main(void) {
   file.close();
 
   // Ecriture des solutions approchées:
-  file.open("solution_approchée.txt");
+  file.open("solution_approchee.txt");
   for (double d : w_eta_h)
     file << d << endl;
   file.close();

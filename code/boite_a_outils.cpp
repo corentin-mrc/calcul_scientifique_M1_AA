@@ -154,11 +154,15 @@ vector<double> scd_membre(double (*rhfs)(double, double), Maillage maille) {
         vector<vector<double>> BT =
             triangle.calc_mat_BT({i, (i + 1) % 3, (i + 2) % 3});
         double res = 0;
+		// FT(1/2, 0) = BT * (1/2, 0) + (x0, y0):
         vector<double> FT = {BT[0][0] / 2 + noeuds[i].get_x(),
                              BT[1][0] / 2 + noeuds[i].get_y()};
+		// wk(FT(1/2, 0)) = 1/2
         res += rhfs(FT[0], FT[1]) / 12;
+		// FT(0, 1/2) = BT * (0, 1/2) + (x0, y0):
         FT = {BT[0][1] / 2 + noeuds[i].get_x(),
               BT[1][1] / 2 + noeuds[i].get_y()};
+		// wk(FT(0, 1/2)) = 1/2
         res += rhfs(FT[0], FT[1]) / 12;
         B[maille.num_int_noeud(noeuds[i])] += res;
       }

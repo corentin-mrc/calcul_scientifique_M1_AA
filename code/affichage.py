@@ -28,6 +28,7 @@ def u_star(x, y):
 	return (a - x) * np.sin(pi * y) / (2 * a)
 
 
+#filename = "solution_exacte.txt"
 filename = "solution_approchee.txt"
 with open(filename) as f:
     content = f.readlines()
