@@ -17,8 +17,8 @@ double gama = 1;
 double lambda = 1;
 double a = 1;
 double b = 1;
-int N = 25;
-int M = 25;
+int N = 12;
+int M = 12;
 double det = abs(2 * (a / N) * (b / M));
 
 double u_g(double y) { return sin(M_PI * y); }
@@ -73,6 +73,15 @@ int main(void) {
   for (double d : w_eta_h)
     file << d << endl;
   file.close();
+  
+  
+  vector<double> X0(B_eta.size(), 1);
+  vector<double> AX0 = mat_vec(X0, maille);
+  vector<double> AB_eta = mat_vec(B_eta, maille);
+  cout << "A * X0  \tA * B_eta" << endl;
+  for (int k = 0; k < I && k < 30; k++)
+	  cout << AX0[k] << "   \t" << AB_eta[k] << endl;
+  cout << endl;
 
   return 0;
 }
