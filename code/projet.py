@@ -29,23 +29,23 @@ def u_star(x, y):
 
 
 def feta(x, y):
-	return ((pi**2 * epsilon + 1) * x - pi**2 * epsilon * a - a + 1) * sin(pi * y) / (2 * a)
+	return ((pi**2 * epsilon + lambd) * x + gama - lambd * a - epsilon * a * pi**2) * sin(pi * y) / (2 * a)
 
 def num_int(i, j):
 	return (j - 1) * (N - 1) + (i - 1)
 
 def inv_num_int(k):
-	return ((k % (N - 1)) + 1, (k // (N - 1)) + 1)
+	return (k % (N - 1)) + 1, (k // (N - 1)) + 1
 
 
 def int_coord(k):
 	i, j = inv_num_int(k)
-	return ((2 * i - N) * a / N, (2 * j - M) * b / M)
+	return (2 * i - N) * a / N, (2 * j - M) * b / M
 
 
 def wk(x, y, k):
-	i, j = ((k % (N - 1)) + 1, (k // (N - 1)) + 1)
-	xi, yj = ((2 * i - N) * a / N, (2 * j - M) * b / M)
+	i, j = (k % (N - 1)) + 1, (k // (N - 1)) + 1
+	xi, yj = (2 * i - N) * a / N, (2 * j - M) * b / M
 	if (i + j) % 2 == 0:
 		if abs(xi - x) < h1 and abs(yj - y) < h2:
 			return 1 - max(abs(xi - x) / h1, abs(yj - y) / h2)
@@ -55,17 +55,17 @@ def wk(x, y, k):
 	return 0
 
 def grad_wk(x, y, k):
-	i, j = ((k % (N - 1)) + 1, (k // (N - 1)) + 1)
-	xi, yj = ((2 * i - N) * a / N, (2 * j - M) * b / M)
+	i, j = (k % (N - 1)) + 1, (k // (N - 1)) + 1
+	xi, yj = (2 * i - N) * a / N, (2 * j - M) * b / M
 	if (i + j) % 2 == 0:
 		if abs(xi - x) < h1 and abs(yj - y) < h2:
-			return (-1 if (x > xi) else 1, -1 if (y > yj) else 1)
-		return (0, 0)
+			xa = abs(x - xi) / h1
+			yb = abs(y - yj) / h2
+			return 0 if (yb > xa) else (-1 if x > xi else 1), 0 if (xa > yb) else (-1 if y > yj else 1)
+		return 0, 0
 	if abs(xi - x) / h1 + abs(yj - y) / h2 < 1:
-		xa = (x - xi) / h1
-		yb = (y - yj) / h2
-		return (0 if (abs(yb) > abs(xa)) else (-1 if x > xi else 1), 0 if (abs(xa) > abs(yb)) else (-1 if y > yj else 1))
-	return (0, 0)
+		return -1 if (x > xi) else 1, -1 if (y > yj) else 1
+	return 0, 0
 
 # A_eta, la matrice du système:
 A = np.zeros((I, I))
@@ -146,7 +146,8 @@ print(sol_appr[:30])
 
 X = np.zeros((N + 1, M + 1))
 Y = np.zeros((N + 1, M + 1))
-Z = np.zeros((N + 1, M + 1))
+Z_sol_appr = np.zeros((N + 1, M + 1))
+Z_sol_exa = np.zeros((N + 1, M + 1))
 
 for i in range(N + 1):
 	xi = (2 * i - N) * a / N
@@ -155,11 +156,13 @@ for i in range(N + 1):
 		X[i][j] = xi
 		Y[i][j] = yj
 		if i != 0 and i != N and j != 0 and j != M:
-			Z[i][j] = sol_appr[num_int(i, j)]
-		Z[i][j] += u_star(xi, yj)
+			Z_sol_appr[i][j] = sol_appr[num_int(i, j)]
+		Z_sol_appr[i][j] += u_star(xi, yj)
+		Z_sol_exa[i][j] = solution_exacte(xi, yj) - u_star(xi, yj)
 fig = plt.figure()
 ax = plt.axes(projection='3d')
-ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+ax.plot_surface(X, Y, Z_sol_appr, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+#ax.plot_surface(X, Y, Z_sol_exa, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
 ax.set_title('solution approchee')
 ax.set_xlabel('x')
 ax.set_ylabel('y')
