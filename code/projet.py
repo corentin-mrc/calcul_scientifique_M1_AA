@@ -21,11 +21,14 @@ CB = (gama / epsilon + sqrt(gama**2 / (epsilon**2) + 4 * pi**2 + 4 * lambd / eps
 C1 = 1 / (exp(-CA) - exp(CA - 2 * CB))
 C2 = 1 / (exp(-CB) - exp(CB - 2 * CA))
 
-def solution_exacte(x, y):
+def u_exact(x, y):
 	return (C1 * exp(CA * x) + C2 * exp(CB * x)) * sin(pi * y)
 
 def u_star(x, y):
 	return (a - x) * sin(pi * y) / (2 * a)
+
+def w_exact(x, y):
+	return u_exact(x, y) - u_star(x, y)
 
 
 def feta(x, y):
@@ -107,47 +110,54 @@ for k in range(I):
 			y += h2 / divy
 		x += h1 / divx
 
+def inv_syst(A, B):
+	X0 = np.ones(I)
+	R0 = B - A.dot(X0)
+	R0_et = R0
+	W0 = R0
+	for j in range(20):
+		AW0 = A.dot(W0)
+		alpha0 = R0.dot(R0_et) / AW0.dot(R0_et)
+		S0 = R0 - alpha0 * AW0
+		AS0 = A.dot(S0)
+		omega0 = AS0.dot(S0) / AS0.dot(AS0)
+		X1 = X0 + alpha0 * W0 + omega0 * S0
+		R1 = S0 - omega0 * AS0
+		beta0 = R1.dot(R0_et) / R0.dot(R0_et) * alpha0 / omega0
+		W1 = R1 + beta0 * (W0 - omega0 * AW0)
+		R0 = R1
+		W0 = W1
+		X0 = X1
+	return X0
 
 X0 = [1] * I
 AX0 = A.dot(X0)
 AB_eta = A.dot(B)
-sol_exa = np.zeros(I)
+w_exa = np.zeros(I)
 for k in range(I):
 	xi, yj = int_coord(k)
-	sol_exa[k] = solution_exacte(xi, yj)
-print("la solution exacte :")
-print(sol_exa[:30])
+	w_exa[k] = w_exact(xi, yj)
+print("le w exact :")
+print(w_exa[:30])
 print("\nsecond membre (B_eta) :")
 print(B[:30])
 print("\nA_eta * X0 :")
 print(AX0[:30])
 print("\nA_eta * B_eta :")
 print(AB_eta[:30])
-X0 = np.ones(I)
-R0 = B - A.dot(X0)
-R0_et = R0
-W0 = R0
-for j in range(20):
-	AW0 = A.dot(W0)
-	alpha0 = R0.dot(R0_et) / AW0.dot(R0_et)
-	S0 = R0 - alpha0 * AW0
-	AS0 = A.dot(S0)
-	omega0 = AS0.dot(S0) / AS0.dot(AS0)
-	X1 = X0 + alpha0 * W0 + omega0 * S0
-	R1 = S0 - omega0 * AS0
-	beta0 = R1.dot(R0_et) / R0.dot(R0_et) * alpha0 / omega0
-	W1 = R1 + beta0 * (W0 - omega0 * AW0)
-	R0 = R1
-	W0 = W1
-	X0 = X1
-sol_appr = X0
-print("\nsolution approchee :")
-print(sol_appr[:30])
+w_appr = inv_syst(A, B)
+print("\nw solution approchee :")
+print(w_appr[:30])
+w_numpy = np.linalg.solve(A, B)
+print("\nw solution par numpy.linalg.solve :")
+print(w_numpy[:30])
 
 X = np.zeros((N + 1, M + 1))
 Y = np.zeros((N + 1, M + 1))
-Z_sol_appr = np.zeros((N + 1, M + 1))
-Z_sol_exa = np.zeros((N + 1, M + 1))
+Z_w_appr = np.zeros((N + 1, M + 1))
+Z_u_appr = np.zeros((N + 1, M + 1))
+Z_w_exa = np.zeros((N + 1, M + 1))
+Z_u_exa = np.zeros((N + 1, M + 1))
 
 for i in range(N + 1):
 	xi = (2 * i - N) * a / N
@@ -156,18 +166,21 @@ for i in range(N + 1):
 		X[i][j] = xi
 		Y[i][j] = yj
 		if i != 0 and i != N and j != 0 and j != M:
-			Z_sol_appr[i][j] = sol_appr[num_int(i, j)]
-		Z_sol_appr[i][j] += u_star(xi, yj)
-		Z_sol_exa[i][j] = solution_exacte(xi, yj) - u_star(xi, yj)
+			Z_w_appr[i][j] = w_appr[num_int(i, j)]
+		Z_u_appr[i][j] = Z_w_appr[i][j] + u_star(xi, yj)
+		Z_w_exa[i][j] = w_exact(xi, yj)
+		Z_u_exa[i][j] = u_exact(xi, yj)
+# choisir quoi afficher entre     0 : w_appr   |   1 : u_appr    |    2 : w_exa    |    3 : u_exa
+choix = 0
+Z = [Z_w_appr, Z_u_appr, Z_w_exa, Z_u_exa]
+Z_nom = ["w_appr", "u_appr", "w_exa", "u_exa"]
 fig = plt.figure()
 ax = plt.axes(projection='3d')
-ax.plot_surface(X, Y, Z_sol_appr, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
-#ax.plot_surface(X, Y, Z_sol_exa, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
-ax.set_title('solution approchee')
+ax.plot_surface(X, Y, Z[choix], rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+ax.set_title(Z_nom[choix])
 ax.set_xlabel('x')
 ax.set_ylabel('y')
-ax.set_zlabel('u(x, y)')
-
+ax.set_zlabel(Z_nom[choix] + "(x, y)")
 
 plt.show()
 
