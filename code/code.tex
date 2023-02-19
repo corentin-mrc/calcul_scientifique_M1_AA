@@ -1,0 +1,58 @@
+\documentclass{article}
+
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{minted}
+
+\usemintedstyle{tango}
+
+\title{Projet}
+\author{Corentin Marcou \and Walid Abed}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Variables globales}
+
+\inputminted{cpp}{donnees_du_probleme.h}
+
+\section{Point d'entrée du programme}
+
+\inputminted{cpp}{main.cpp}
+
+\section{Classe Noeud}
+
+\subsection{header}
+\inputminted{cpp}{noeud.h}
+
+\subsection{implémentation}
+\inputminted{cpp}{noeud.cpp}
+
+\section{Classe Triangle}
+
+\subsection{header}
+\inputminted{cpp}{triangle.h}
+
+\subsection{implémentation}
+\inputminted{cpp}{triangle.cpp}
+
+\section{Classe Maillage}
+
+\subsection{header}
+\inputminted{cpp}{maillage.h}
+
+\subsection{implémentation}
+\inputminted{cpp}{maillage.cpp}
+
+\section{Boite à outils}
+
+\subsection{header}
+\inputminted{cpp}{boite_a_outils.h}
+
+\subsection{implémentation}
+\inputminted{cpp}{boite_a_outils.cpp}
+
+\end{document}
