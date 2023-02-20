@@ -64,10 +64,10 @@ def grad_wk(x, y, k):
 		if abs(xi - x) < h1 and abs(yj - y) < h2:
 			xa = abs(x - xi) / h1
 			yb = abs(y - yj) / h2
-			return 0 if (yb > xa) else (-1 if x > xi else 1), 0 if (xa > yb) else (-1 if y > yj else 1)
+			return 0 if (yb > xa) else (-1 / h1 if x > xi else 1 / h1), 0 if (xa > yb) else (-1 / h2 if y > yj else 1 / h2)
 		return 0, 0
 	if abs(xi - x) / h1 + abs(yj - y) / h2 < 1:
-		return -1 if (x > xi) else 1, -1 if (y > yj) else 1
+		return -1 / h1 if (x > xi) else 1 / h1, -1 / h2 if (y > yj) else 1 / h2
 	return 0, 0
 
 # A_eta, la matrice du système:
@@ -137,10 +137,18 @@ w_exa = np.zeros(I)
 for k in range(I):
 	xi, yj = int_coord(k)
 	w_exa[k] = w_exact(xi, yj)
-print("le w exact :")
+print("A_eta :")
+print(A[:10][:10])
+print("\nle w exact :")
 print(w_exa[:30])
 print("\nsecond membre (B_eta) :")
 print(B[:30])
+print("\nA_eta * w_eta")
+for i in range(19):
+	for j in range(19):
+		print("{:10.4f}".format(A[i][j]), end = "")
+	print()
+print((A.dot(w_exa))[:30])
 print("\nA_eta * X0 :")
 print(AX0[:30])
 print("\nA_eta * B_eta :")
