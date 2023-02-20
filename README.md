@@ -11,5 +11,15 @@ Nous avons utilisé la notion de classe. Il y a trois classes:
 3. Maillage: contient un tableau de triangles, contient les méthodes assocées aux indices i, j, aux numéro global et aux numéro intérieur.
 En plus de ces classes, le fichier boite_a_outils contient toutes les méthodes relatives à l'approximation de la solution.
 
-Pour compiler le projet, on pourra utilisé le fichier CMakeLists.txt avec CMake ou utilisé directement g++.
+Pour compiler le projet, on pourra utiliser le fichier CMakeLists.txt avec CMake:
+```
+mkdir build
+cd build
+cmake ..
+make
+```
+ou utiliser directement g++ depuis le répertoire code:
+```
+g++ main.cpp noeud.cpp triangle.cpp maillage.cpp boite_a_outils.cpp
+```
 L'affichage des données obtenues se fait avec Python.
