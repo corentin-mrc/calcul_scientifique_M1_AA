@@ -5,21 +5,28 @@ from math import sqrt, pi, exp, sin
 
 a = 1
 b = 1
-N = 12
-M = 12
+N = 6
+M = 6
 divx = 50
 divy = 50
 epsilon = 1
 gama = 1
 lambd = 1
+I = (N - 1) * (M - 1)
 h1 = (2 * a) / N
 h2 = (2 * b) / M
-I = (N - 1) * (M - 1)
+p1 = N / (2 * a)
+p2 = M / (2 * b)
 
 CA = (gama / epsilon - sqrt(gama**2 / (epsilon**2) + 4 * pi**2 + 4 * lambd / epsilon)) / 2
 CB = (gama / epsilon + sqrt(gama**2 / (epsilon**2) + 4 * pi**2 + 4 * lambd / epsilon)) / 2
 C1 = 1 / (exp(-CA) - exp(CA - 2 * CB))
 C2 = 1 / (exp(-CB) - exp(CB - 2 * CA))
+
+A = np.zeros((I, I))
+A_eta_comp = [dict() for i in range(I)]
+B = np.zeros(I)
+app = [0, 0, 0, 0, 0, 0]
 
 def u_exact(x, y):
 	return (C1 * exp(CA * x) + C2 * exp(CB * x)) * sin(pi * y)
@@ -44,6 +51,9 @@ def inv_num_int(k):
 def int_coord(k):
 	i, j = inv_num_int(k)
 	return (2 * i - N) * a / N, (2 * j - M) * b / M
+
+def sur_le_bord(i, j):
+	return i == 0 or i == N or j == 0 or j == M
 
 
 def wk(x, y, k):
@@ -70,47 +80,43 @@ def grad_wk(x, y, k):
 		return -1 / h1 if (x > xi) else 1 / h1, -1 / h2 if (y > yj) else 1 / h2
 	return 0, 0
 
-# A_eta, la matrice du système:
-A = np.zeros((I, I))
-for k in range(I):
-	ik, jk = inv_num_int(k)
-	xik, yjk = int_coord(k)
-	for ij in range(max(1, ik - 1), min(N - 1, ik + 1) + 1):
-		for jj in range(max(1, jk - 1), min(M - 1, jk + 1) + 1):
-			j = num_int(ij, jj)
-			x = xik - h1
-			while x < xik + h1:
-				y = yjk - h2
-				while y < yjk + h2:
-					w_k_grad = grad_wk(x, y, k)
-					w_k = wk(x, y, k)
-					w_j_grad = grad_wk(x, y, j)
-					w_j = wk(x, y, j)
-					A[k][j] += epsilon * w_j_grad[0] * w_k_grad[0]
-					A[k][j] += epsilon * w_j_grad[1] * w_k_grad[1]
-					A[k][j] += gama * w_j_grad[0] * w_k
-					A[k][j] += lambd * w_j * w_k
-					y += h2 / divy
-				x += h1 / divx
-			A[k][j] /= divx * divy
+def ajout(k, j, val):
+	if j in A_eta_comp[k]:
+		A_eta_comp[k][j] += val
+	else:
+		A_eta_comp[k][j] = val
 
-# B_eta, le second membre:
-B = np.zeros(I)
-for k in range(I):
-	apr_inte = 0
-	i = (k % (N - 1)) + 1
-	j = (k // (N - 1)) + 1
-	xi = (2 * i - N) * a / N
-	yj = (2 * j - M) * b / M
-	x = xi - h1
-	while x < xi + h1:
-		y = yj - h2
-		while y < yj + h2:
-			B[k] += feta(x, y) * wk(x, y, k) / divx / divy
-			y += h2 / divy
-		x += h1 / divx
+def calc_A_comp(i0, j0, i1, j1, i2, j2):
+	M_e = [[p1**2 + p2**2, -p1**2, -p2**2], [-p1**2, p1**2, 0], [-p2**2, 0, p2**2]]
+	k0 = num_int(i0, j0)
+	k1 = num_int(i1, j1)
+	k2 = num_int(i2, j2)
+	iss = [i0, i1, i2]
+	jss = [j0, j1, j2]
+	kss = [k0, k1, k2]
+	gradx = [(i0 - i1) * p1, (i1 - i0) * p1, 0]
+	for k in range(3):
+		if not sur_le_bord(iss[k], jss[k]):
+			for j in range(3):
+				if not sur_le_bord(iss[j], jss[j]):
+					aaj = epsilon * M_e[k][j] * h1 * h2 / 2
+					aaj += gama * gradx[j] * h1 * h2 / 6
+					aaj += lambd * h1 * h2 / (12 if (k == j) else 24)
+					if kss[k] == 0 and kss[j] == 0:
+						app[3] += epsilon * M_e[k][j] * h1 * h2 / 2
+						print("appem :", kss[k], kss[j], epsilon * M_e[k][j] * h1 * h2 / 2)
+						app[4] += gama * gradx[j] * h1 * h2 / 6
+						app[5] += lambd * h1 * h2 / (12 if (k == j) else 24)
+					ajout(kss[k], kss[j], aaj)
 
-def inv_syst(A, B):
+def matvec(Xv):
+	Yv = np.zeros(I)
+	for k in range(I):
+		for j in A_eta_comp[k]:
+			Yv[k] += A_eta_comp[k][j] * Xv[j]
+	return Yv
+
+def inv_syst():
 	X0 = np.ones(I)
 	R0 = B - A.dot(X0)
 	R0_et = R0
@@ -130,6 +136,96 @@ def inv_syst(A, B):
 		X0 = X1
 	return X0
 
+def inv_syst_mat_vec():
+	X0 = np.ones(I)
+	R0 = B - matvec(X0)
+	R0_et = R0
+	W0 = R0
+	for j in range(20):
+		AW0 = matvec(W0)
+		alpha0 = R0.dot(R0_et) / AW0.dot(R0_et)
+		S0 = R0 - alpha0 * AW0
+		AS0 = matvec(S0)
+		omega0 = AS0.dot(S0) / AS0.dot(AS0)
+		X1 = X0 + alpha0 * W0 + omega0 * S0
+		R1 = S0 - omega0 * AS0
+		beta0 = R1.dot(R0_et) / R0.dot(R0_et) * alpha0 / omega0
+		W1 = R1 + beta0 * (W0 - omega0 * AW0)
+		R0 = R1
+		W0 = W1
+		X0 = X1
+	return X0
+
+
+# A_eta, la matrice du système:
+for k in range(I):
+	ik, jk = inv_num_int(k)
+	xik, yjk = int_coord(k)
+	for ij in range(max(1, ik - 1), min(N - 1, ik + 1) + 1):
+		for jj in range(max(1, jk - 1), min(M - 1, jk + 1) + 1):
+			j = num_int(ij, jj)
+			x = xik - h1
+			while x < xik + h1:
+				y = yjk - h2
+				while y < yjk + h2:
+					w_k_grad = grad_wk(x, y, k)
+					w_k = wk(x, y, k)
+					w_j_grad = grad_wk(x, y, j)
+					w_j = wk(x, y, j)
+					A[k][j] += epsilon * w_j_grad[0] * w_k_grad[0]
+					A[k][j] += epsilon * w_j_grad[1] * w_k_grad[1]
+					A[k][j] += gama * w_j_grad[0] * w_k
+					A[k][j] += lambd * w_j * w_k
+					if k == 0 and j == 0:
+						app[0] += (epsilon * w_j_grad[0] * w_k_grad[0]) * ((h1 / divx) * (h2 / divy))
+						app[0] += (epsilon * w_j_grad[1] * w_k_grad[1]) * ((h1 / divx) * (h2 / divy))
+						app[1] += (gama * w_j_grad[0] * w_k) * ((h1 / divx) * (h2 / divy))
+						app[2] += (lambd * w_j * w_k) * ((h1 / divx) * (h2 / divy))
+					y += h2 / divy
+				x += h1 / divx
+			A[k][j] *= ((h1 / divx) * (h2 / divy))
+
+# A_eta_comp, la matrice du système compressee:
+for i in range(N):
+	for j in range(M):
+		if (i + j) % 2 == 0:
+			# C
+			i0, j0 = i + 1, j
+			i1, j1 = i, j
+			i2, j2 = i + 1, j + 1
+			calc_A_comp(i0, j0, i1, j1, i2, j2)
+			# D
+			i0, j0 = i, j + 1
+			i1, j1 = i + 1, j + 1
+			i2, j2 = i, j
+			calc_A_comp(i0, j0, i1, j1, i2, j2)
+		else:
+			# A
+			i0, j0 = i, j
+			i1, j1 = i + 1, j
+			i2, j2 = i, j + 1
+			calc_A_comp(i0, j0, i1, j1, i2, j2)
+			# B
+			i0, j0 = i + 1, j + 1
+			i1, j1 = i, j + 1
+			i2, j2 = i + 1, j
+			calc_A_comp(i0, j0, i1, j1, i2, j2)
+
+# B_eta, le second membre:
+for k in range(I):
+	apr_inte = 0
+	i = (k % (N - 1)) + 1
+	j = (k // (N - 1)) + 1
+	xi = (2 * i - N) * a / N
+	yj = (2 * j - M) * b / M
+	x = xi - h1
+	while x < xi + h1:
+		y = yj - h2
+		while y < yj + h2:
+			B[k] += (feta(x, y) * wk(x, y, k)) * ((h1 / divx) * (h2 / divy))
+			y += h2 / divy
+		x += h1 / divx
+
 X0 = [1] * I
 AX0 = A.dot(X0)
 AB_eta = A.dot(B)
@@ -143,22 +239,36 @@ print("\nle w exact :")
 print(w_exa[:30])
 print("\nsecond membre (B_eta) :")
 print(B[:30])
-print("\nA_eta * w_eta")
+print("\nla matrice A (A_eta) :")
 for i in range(19):
 	for j in range(19):
 		print("{:10.4f}".format(A[i][j]), end = "")
 	print()
+print("\nA_eta_comp :")
+for k in range(19):
+	print(k, end = " : " if k > 9 else "  : ")
+	for j in A_eta_comp[k]:
+		print(j, ("{:10.4f}".format(A_eta_comp[k][j])), end = " | ")
+	print()
+print("\nA_eta * w_eta")
 print((A.dot(w_exa))[:30])
 print("\nA_eta * X0 :")
 print(AX0[:30])
 print("\nA_eta * B_eta :")
 print(AB_eta[:30])
-w_appr = inv_syst(A, B)
+w_appr = inv_syst_mat_vec()
+print("\nw solution approchee mat vec :")
+print(w_appr[:30])
+w_appr = inv_syst()
 print("\nw solution approchee :")
 print(w_appr[:30])
 w_numpy = np.linalg.solve(A, B)
 print("\nw solution par numpy.linalg.solve :")
 print(w_numpy[:30])
+print("\nA[0][0] = ")
+print(app[0], app[1], app[2], app[0] + app[1] + app[2])
+print(app[3], app[4], app[5], app[3] + app[4] + app[5])
+
 
 X = np.zeros((N + 1, M + 1))
 Y = np.zeros((N + 1, M + 1))
